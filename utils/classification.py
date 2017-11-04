@@ -430,6 +430,7 @@ class classifier:
                 statement += "Iter: " + str(iter) + " "
                 statement += "Time: " + str((current_time - start_time) / 60) + " "
                 statement += "Loss_tr: " + str(loss_tr)
+                statement += "Acc_tr: " + str(acc_tr)
                 loss_tr = 0.0
                 acc_tr = 0.0
                 if self.opts.path_validation:
@@ -437,6 +438,7 @@ class classifier:
                     self.val_loss.append(loss_val)
                     self.val_acc.append(acc_val)
                     statement += " Loss_val: " + str(loss_val)
+                    statement += " Acc_val: "+str(acc_val)
                     if self.opts.bool_kappa:
                         statement += " Kappa: " + str(self.quadratic_kappa(preds, truths))
                     if self.opts.bool_confusion:
@@ -461,6 +463,15 @@ class classifier:
         start_time = time.time()
         loss_te = 0.0
         self.saver.restore(self.sess, self.opts.path_model)
+                loss_tr, acc_tr,preds,truths = self.test_all(self.opts.path_train)
+        print "Train Accuracy: "+str(acc_tr)
+        print "Train Loss: "+str(loss_tr)
+        loss_val, acc_val,preds,truths = self.test_all(self.opts.path_validation)
+        print "Validation Accuracy: "+str(acc_val)
+        print "Validation Loss: "+str(loss_val)
+        loss_test, acc_test,preds,truths = self.test_all(self.opts.path_test)
+        print "Test Accuracy: "+str(acc_test)
+        print "Test Loss: "+str(loss_test)
 
     def do_inference(self):
         """
