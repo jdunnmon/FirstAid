@@ -1,0 +1,5 @@
+export FIRSTAIDHOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo "First Aid home directory: $FIRSTAIDHOME"
+export PYTHONPATH="$PYTHONPATH:$FIRSTAIDHOME"
+export PATH="$PATH:$FIRSTAIDHOME"
+echo "Environment variables set!"
