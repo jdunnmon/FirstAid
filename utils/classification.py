@@ -463,7 +463,7 @@ class classifier:
         start_time = time.time()
         loss_te = 0.0
         self.saver.restore(self.sess, self.opts.path_model)
-                loss_tr, acc_tr,preds,truths = self.test_all(self.opts.path_train)
+        loss_tr, acc_tr,preds,truths = self.test_all(self.opts.path_train)
         print "Train Accuracy: "+str(acc_tr)
         print "Train Loss: "+str(loss_tr)
         loss_val, acc_val,preds,truths = self.test_all(self.opts.path_validation)
