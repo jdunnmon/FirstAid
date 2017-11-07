@@ -464,6 +464,9 @@ class classifier:
         loss_te = 0.0
         self.saver.restore(self.sess, self.opts.path_model)
         loss_tr, acc_tr,preds,truths = self.test_all(self.opts.path_train)
+        
+        class_balance = float(np.sum(truths))/len(truths)
+        acc_maj_class = max(class_balance,1-class_balance)
         print "Train Accuracy: "+str(acc_tr)
         print "Train Loss: "+str(loss_tr)
         loss_val, acc_val,preds,truths = self.test_all(self.opts.path_validation)
@@ -472,6 +475,8 @@ class classifier:
         loss_test, acc_test,preds,truths = self.test_all(self.opts.path_test)
         print "Test Accuracy: "+str(acc_test)
         print "Test Loss: "+str(loss_test)
+       
+        print "Majority Classifier Accuracy:"+str(acc_maj_class)
 
     def do_inference(self):
         """
