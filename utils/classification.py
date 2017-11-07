@@ -17,6 +17,8 @@ from nets_classification import *
 from data import *
 from ops import *
 
+from keras import backend as K
+
 def create_exec_statement_test(opts):
     """
     Creates an executable statement string.
@@ -209,6 +211,7 @@ class classifier:
         self.dataYY = np.zeros(yTr_size, dtype=np.int64)
 
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+	K.set_session(sess)
 
     def average_accuracy(self, logits, truth):
         prediction = np.argmax(logits, axis=1)
