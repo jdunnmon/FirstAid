@@ -11,6 +11,8 @@ import socket
 import sys
 import time
 
+from keras.applications.resnet50 import preprocess_input as preprocess_input_keras_resnet50
+
 def find_data_shape(path_data):
     """
     Reads in one piece of data to find out number of channels.
@@ -101,4 +103,15 @@ def data_augment(data_iter, data_seg=None, rand_seed=None):
     data_iter += add_rand
     if np.any(data_seg):
         return data_iter, data_seg
+    return data_iter
+
+def data_format(data_iter,net=None):
+    if net == None:
+        data_iter = data_iter
+    elif net == "Keras_ResNet50":
+        import pdb; pdb.set_trace()
+        data_iter = 255.0*data_iter
+        data_iter_2 = np.append(data_iter, data_iter,axis=2)
+        data_iter_3 = np.append(data_iter_2, data_iter,axis=2)
+        data_iter = preprocess_input_keras_resnet50(data_iter_3)
     return data_iter

@@ -14,6 +14,7 @@ import time
 
 from layers import *
 from nets_classification import *
+from keras_nets_classification import *
 from data import *
 from ops import *
 
@@ -106,6 +107,11 @@ class classifier:
             self.matrix_size, self.num_channels = find_data_shape(self.opts.path_test)
         else:
             self.matrix_size, self.num_channels = 224,1
+        
+        #adjusting for specific networks
+        if self.opts.network == "Keras_ResNet50":
+            num_channels = 3
+            
         xTe_size = [1, self.matrix_size, self.matrix_size, self.num_channels]
         yTe_size = [1]
         each_bs  = self.opts.batch_size
@@ -128,6 +134,9 @@ class classifier:
         self.prob = tf.nn.softmax(self.pred)
         self.acc = get_accuracy(self.pred, self.yTe)
 
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        K.set_session(self.sess)
+        
         # Listing the data.
         if self.opts.path_train:
             list_imgs = listdir(self.opts.path_train)
@@ -209,9 +218,6 @@ class classifier:
 
         self.dataXX = np.zeros(xTr_size, dtype=np.float32)
         self.dataYY = np.zeros(yTr_size, dtype=np.int64)
-
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-	K.set_session(sess)
 
     def average_accuracy(self, logits, truth):
         prediction = np.argmax(logits, axis=1)
@@ -307,7 +313,7 @@ class classifier:
             while(True):
                 try:
                     with h5py.File(join(self.opts.path_train, self.X_tr[ind], img_filename)) as hf:
-                        data_iter = np.array(hf.get('data'))
+                        data_iter = data_format(np.array(hf.get('data')),net=self.opts.network)
                         data_label = np.array(hf.get('label'))
                     break
                 except:
@@ -330,7 +336,7 @@ class classifier:
         while(True):
             try:
                 with h5py.File(path_file) as hf:
-                    dataXX[0,:,:,:] = np.array(hf.get('data'))
+                    dataXX[0,:,:,:] = data_format(np.array(hf.get('data')),net=self.opts.network)
                     break
             except:
                 time.sleep(0.001)
@@ -351,7 +357,7 @@ class classifier:
         while(True):
             try:
                 with h5py.File(path_file) as hf:
-                    dataXX[0,:,:,:] = np.array(hf.get('data'))
+                    dataXX[0,:,:,:] = data_format(np.array(hf.get('data')),net=self.opts.network)
                     dataYY[0]   = np.array(hf.get('label'))
                     break
             except:
@@ -480,6 +486,7 @@ class classifier:
         print "Test Loss: "+str(loss_test)
        
         print "Majority Classifier Accuracy:"+str(acc_maj_class)
+        return acc_tr, acc_val, acc_test
 
     def do_inference(self):
         """
