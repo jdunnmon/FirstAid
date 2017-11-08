@@ -3,6 +3,12 @@ import tensorflow as tf
 
 from layers import *
 
+import sys
+YELLOWFIN_PATH = '/lfs/raiders2/0/jdunnmon/repos/YellowFin/tuner_utils/'
+sys.path.append(YELLOWFIN_PATH)
+from yellowfin import YFOptimizer
+
+
 def get_L2_loss(reg_param, key="reg_variables"):
     """
     L2 Loss Layer. Usually will use "reg_variables" collection.
@@ -52,6 +58,7 @@ def get_optimizer(lr, decay, epoch_every):
     starter_learning_rate = float(lr)
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                epoch_every, decay, staircase=True)
-    #optimizer = tf.train.RMSPropOptimizer(learning_rate)
-    optimizer = tf.train.AdamOptimizer(learning_rate)
+    optimizer = tf.train.RMSPropOptimizer(learning_rate)
+    #optimizer = tf.train.AdamOptimizer(learning_rate)
+    #optimizer = YFOptimizer()
     return optimizer, global_step

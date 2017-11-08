@@ -20,6 +20,20 @@ from ops import *
 
 from keras import backend as K
 
+def super_print(path, statement):
+    """
+    This basically prints everything in statement.
+    We'll print to stdout and path_log.
+        
+    """
+    sys.stdout.write(statement + '\n')
+    sys.stdout.flush()
+    f = open(path, 'a')
+    f.write(statement + '\n')
+    f.close()
+    return 0
+
+
 def create_exec_statement_test(opts):
     """
     Creates an executable statement string.
@@ -476,16 +490,16 @@ class classifier:
         
         class_balance = float(np.sum(truths))/len(truths)
         acc_maj_class = max(class_balance,1-class_balance)
-        print "Train Accuracy: "+str(acc_tr)
-        print "Train Loss: "+str(loss_tr)
+        self.super_print("Train Accuracy: "+str(acc_tr))
+        self.super_print("Train Loss: "+str(loss_tr))
         loss_val, acc_val,preds,truths = self.test_all(self.opts.path_validation)
-        print "Validation Accuracy: "+str(acc_val)
-        print "Validation Loss: "+str(loss_val)
+        self.super_print("Validation Accuracy: "+str(acc_val))
+        self.super_print("Validation Loss: "+str(loss_val))
         loss_test, acc_test,preds,truths = self.test_all(self.opts.path_test)
-        print "Test Accuracy: "+str(acc_test)
-        print "Test Loss: "+str(loss_test)
+        self.super_print("Test Accuracy: "+str(acc_test))
+        self.super_print("Test Loss: "+str(loss_test))
        
-        print "Majority Classifier Accuracy:"+str(acc_maj_class)
+        self.super_print("Majority Classifier Accuracy:"+str(acc_maj_class))
         return acc_tr, acc_val, acc_test
 
     def do_inference(self):
