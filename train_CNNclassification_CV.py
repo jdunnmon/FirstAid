@@ -49,21 +49,21 @@ def main(args):
 
     # Creating Object
     opts = parser.parse_args(args[1:])
-    acc_train = []
+    acc_tr = []
     acc_val = []
     acc_test = []
     seeds_str = opts.rand_seeds.split(',')
     seeds= [int(a) for a in seeds_str]
     
     for ii,rs in enumerate(seeds):
-        print "CREATING CV SPLIT %d of %d" % (ii, len(seeds))
+        print "CREATING CV SPLIT %d of %d" % (ii+1, len(seeds))
         #Can set suffix argument here using argparse
         if opts.mlo_only:
             suf = '_mlo'
         else:
             suf = ''
         create_val_split(rs,suf,opts.mlo_only)
-        print "TRAINING MODEL %d of %d" % (ii, len(seeds))
+        print "TRAINING MODEL %d of %d" % (ii+1, len(seeds))
         CNN_obj = classifier(opts)
         CNN_obj.train_model() #Train/Validate the Model
         acc_tr_cv, acc_val_cv, acc_test_cv = CNN_obj.test_model() #Test the Model.
@@ -83,7 +83,7 @@ def main(args):
     
     #Saving accuracies
     print "Saving Accuracies..."
-    logpath = os.path.dirname(CNN_obj.path_log)
+    logpath = os.path.dirname(opts.path_log)
     outfile = os.path.join(logpath,'run_accuracies.npz')      
     np.savez(outfile, acc_test=acc_test,acc_val=acc_val,acc_tr=acc_tr)
     print "Program Complete!"

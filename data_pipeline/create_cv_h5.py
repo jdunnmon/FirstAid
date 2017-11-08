@@ -46,6 +46,9 @@ def save_as_h5(root_path, folder_path, image_path, mask_path, label_dictionary, 
     path_prefix = join(root_path,folder_path)
     if not isdir(path_prefix):
         mkdir(path_prefix)
+    else:
+        shutil.rmtree(path_prefix)
+        mkdir(path_prefix)
     for fname in valid_filenames:
         #segment the filename
         patient_name = fname.split("_")[1]
@@ -95,7 +98,7 @@ def create_val_split(rs,suf,mlo_only=True):
     x_train,y_train,x_val,y_val= \
     data.create_train_splits(1,train_size=0.85,val_size=0.15,rand_seed=rand_seed)
     x_test,y_test = data.create_test()
-    data.write_splits(x_train,x_val,x_test,'cv_split_'+str(rs),suffix=suf)
+    data.write_splits(x_train,x_val,x_test,'cv_split'+str(rs),suffix=suf)
     print len(x_train),len(y_train),len(x_val),len(y_val),len(x_test),len(y_test)
 
     #creating h5 directories
