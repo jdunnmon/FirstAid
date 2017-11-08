@@ -1,0 +1,10 @@
+The scripts in this folder generates data for Tanda and FirstAid from dicom images downloaded from 
+
+https://wiki.cancerimagingarchive.net/plugins/servlet/mobile?contentId=22516629#content/view/22516629
+
+1. runmatlab.sh - processes the dicoms into folders for train, test mammograms and masks which are saved
+as 750x750 tifs
+
+2. encode_labels_as_json.py - processes test and train labels into a single json file
+3. split_train_set.py - using the output of (1) creates validation split and puts data into the correct folder format for tanda
+4. save_as_h5.py - using the output of (1) puts data into the h5 format for First Aid
