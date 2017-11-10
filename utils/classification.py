@@ -452,7 +452,7 @@ class classifier:
                 statement = "\t"
                 statement += "Iter: " + str(iter) + " "
                 statement += "Time: " + str((current_time - start_time) / 60) + " "
-                statement += "Loss_tr: " + str(loss_tr)
+                statement += "Loss_tr: " + str(loss_tr) + " "
                 statement += "Acc_tr: " + str(acc_tr)
                 loss_tr = 0.0
                 acc_tr = 0.0

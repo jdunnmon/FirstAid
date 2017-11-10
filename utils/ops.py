@@ -4,7 +4,7 @@ import tensorflow as tf
 from layers import *
 
 import sys
-YELLOWFIN_PATH = '/lfs/raiders2/0/jdunnmon/repos/YellowFin/tuner_utils/'
+YELLOWFIN_PATH = '../../YellowFin/tuner_utils/'
 sys.path.append(YELLOWFIN_PATH)
 from yellowfin import YFOptimizer
 

@@ -6,16 +6,19 @@ PATH_VAL="$TRAIN_PATH_ROOT/h5_val_set$DATA_SUF"
 PATH_TEST="$TRAIN_PATH_ROOT/h5_test_set$DATA_SUF"
 OUTPUT_PATH="/lfs/local/0/jdunnmon/data_aug/firstaid/all_runs/logs"
 
-CUDA_VISIBLE_DEVICES=0,1 
+CUDA_VISIBLE_DEVICES=0
 
 NET_NAME=GoogLe
-EPOCHS=100
+EPOCHS=200
 
-for lr in 0.001 0.0001
+EXP_NAME=hp_search_${NET_NAME}
+START_DATE=`date +"%m_%d_%y"`
+
+for lr in 0.001 0.0001 0.00001
 do
 for dp in 0.9 1.0
 do
-for l2 in 0.0001 0.00001
+for l2 in 0.0001 0.000001
 do
 for dec in 0.95 0.99
 do
@@ -24,10 +27,9 @@ do
 for bs in 64 128
 do
   echo "Running Case with LR = $lr, L2= $l2, DO = $dp, DEC= $dec, l1=$l1, BS=$bs"
-  EXP_NAME=hp_search_${NET_NAME}_ep_${EPOCHS}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_$bs
-  DATE=`date +"%m_%d_%y"`
+  TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_$bs
   TIME=`date +"%H_%M_%S"`
-  LOGDIR="$OUTPUT_PATH/${DATE}/${EXP_NAME}"
+  LOGDIR="$OUTPUT_PATH/${START_DATE}/${EXP_NAME}/${TRIAL_NAME}"
   mkdir -p $LOGDIR
   PATH_SAVE="$LOGDIR/model"
   PATH_VIS="$LOGDIR/vis.png"
@@ -36,7 +38,7 @@ do
   echo "Saving log to '$LOGFILE'"
 
   #source set_env.sh
-  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 2 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 0.0 --bs $bs --ep $EPOCHS --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
+  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 2 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
  done
  done
  done
