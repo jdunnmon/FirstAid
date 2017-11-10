@@ -57,38 +57,42 @@ def save_as_h5(root_path, folder_path, image_path, mask_path, label_dictionary, 
         #open image
         cur_image_path = join(join(root_path, image_path), fname)
 
-        #cur_mask_path = join(join(root_path, mask_path), fname)
+        cur_mask_path = join(join(root_path, mask_path), fname)
         im = Image.open(cur_image_path)
-        if cropping_style == 'default':
-            im = np.array(im.resize((IMAGE_SIZE, IMAGE_SIZE)))
-        elif cropping_style == 'center':
-            pre_crop_size = IMAGE_SIZE*3
-            im = np.array(im.resize((pre_crop_size, pre_crop_size)))
-            im = im[224:448,224:448]
-        elif cropping_style == 'random':
-            pre_crop_size = IMAGE_SIZE*3
-            im = np.array(im.resize((pre_crop_size, pre_crop_size)))
-            start_indices = [0, 224, 448]
-            x_start = random.choice(start_indices)
-            y_start = random.choice(start_indices)
-            im = im[y_start:y_start+224,x_start:x_start+224]
+        # if cropping_style == 'default':
+        #     im = np.array(im.resize((IMAGE_SIZE, IMAGE_SIZE)))
+        # elif cropping_style == 'center':
+        #     pre_crop_size = IMAGE_SIZE*3
+        #     im = np.array(im.resize((pre_crop_size, pre_crop_size)))
+        #     im = im[224:448,224:448]
+        # elif cropping_style == 'random':
+        #     pre_crop_size = IMAGE_SIZE*3
+        #     im = np.array(im.resize((pre_crop_size, pre_crop_size)))
+        #     start_indices = [0, 224, 448]
+        #     x_start = random.choice(start_indices)
+        #     y_start = random.choice(start_indices)
+        #     im = im[y_start:y_start+224,x_start:x_start+224]
+        im = np.array(im)
         im = img_as_float(im)
         im = im[:,:,np.newaxis]
         #create data
         #open mask
-        #mask = Image.open(mask_path)
-        #mask = np.array(mask.resize((IMAGE_SIZE, IMAGE_SIZE)))
-        #mask = mask.astype(np.int64)
+        mask = Image.open(cur_mask_path)
+        mask = np.array(mask)
+        mask = mask.astype(np.int64)
 
         #get label
         label = label_dictionary[fname]
         #save the h5 image in the right patient subfolder
         fname_stripped = fname[:len(fname)-4]
         path_h5 = join(directory, fname_stripped+'.h5')
+        print "H5 FILE PATH: ", path_h5
         h5f = h5py.File(path_h5, 'w')
         h5f.create_dataset('data', data=im)
+        h5f.create_dataset('seg', data=mask)
         #h5f.create_dataset('seg', data=label)
         h5f.create_dataset('label', data=label)
+        h5f.close()
 
 
 
