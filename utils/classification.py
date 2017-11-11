@@ -1,6 +1,7 @@
 import matplotlib.animation as animation
 import h5py
 import numpy as np
+import os
 from os import listdir, remove, mkdir
 from os.path import isfile, join, isdir
 import scipy
@@ -150,7 +151,11 @@ class classifier:
 
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         K.set_session(self.sess)
-        
+        graph  = self.sess.graph
+        tbpath,_ = os.path.split(self.opts.path_log)
+        tbdir = join(tbpath,"tbout") 
+        self.writer = tf.summary.FileWriter(tbdir, graph)
+ 
         # Listing the data.
         if self.opts.path_train:
             list_imgs = listdir(self.opts.path_train)
@@ -448,6 +453,14 @@ class classifier:
                     acc_tr *= self.print_every
                 self.tr_loss.append(loss_tr)
                 self.tr_acc.append(acc_tr)
+
+                #summaries = [] 
+                #self.writer.add_summary(tf.summary.scalar("train_acc",acc_tr))
+                value = tf.summary.Summary.Value(tag="train_accuracy", simple_value=acc_tr)
+                self.writer.add_summary(tf.summary.Summary(value=[value]),iter)
+
+                #self.writer.add_summary(tf.summary.scalar("train_loss",loss_tr))
+
                 current_time = time.time()
                 statement = "\t"
                 statement += "Iter: " + str(iter) + " "
@@ -462,6 +475,10 @@ class classifier:
                     self.val_acc.append(acc_val)
                     statement += " Loss_val: " + str(loss_val)
                     statement += " Acc_val: "+str(acc_val)
+
+                 #   self.writer.add_summary(tf.summary.scalar("val_loss",loss_val))
+                 #   self.writer.add_summary(tf.summary.scalar("val_acc",acc_val))
+
                     if self.opts.bool_kappa:
                         statement += " Kappa: " + str(self.quadratic_kappa(preds, truths))
                     if self.opts.bool_confusion:
@@ -471,6 +488,9 @@ class classifier:
                         self.saver.save(self.sess, self.opts.path_model)
                 if self.opts.bool_display:
                     self.super_graph()
+                #summary_out = tf.summary.merge(summaries)
+                #import pdb; pdb.set_trace()
+                #self.writer.add_summary(summary_out,iter)
                 self.super_print(statement)
         if (not self.opts.path_validation) and self.opts.path_model:
             self.saver.save(self.sess, self.opts.path_model)
