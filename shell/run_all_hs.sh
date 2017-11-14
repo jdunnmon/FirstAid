@@ -10,6 +10,7 @@ CUDA_VISIBLE_DEVICES=0
 
 NET_NAME=GoogLe
 EPOCHS=200
+OPTIMIZER=rmsprop
 
 EXP_NAME=hp_search_${NET_NAME}
 START_DATE=`date +"%m_%d_%y"`
@@ -27,7 +28,7 @@ do
 for bs in 64 128
 do
   echo "Running Case with LR = $lr, L2= $l2, DO = $dp, DEC= $dec, l1=$l1, BS=$bs"
-  TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_$bs
+  TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_opt_${OPTIMIZER}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_${bs}
   TIME=`date +"%H_%M_%S"`
   LOGDIR="$OUTPUT_PATH/${START_DATE}/${EXP_NAME}/${TRIAL_NAME}"
   mkdir -p $LOGDIR
@@ -38,7 +39,7 @@ do
   echo "Saving log to '$LOGFILE'"
 
   #source set_env.sh
-  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 2 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
+  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 1 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
  done
  done
  done
