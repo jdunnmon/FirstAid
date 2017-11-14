@@ -6,9 +6,9 @@ PATH_VAL="$TRAIN_PATH_ROOT/h5_val_set$DATA_SUF"
 PATH_TEST="$TRAIN_PATH_ROOT/h5_test_set$DATA_SUF"
 OUTPUT_PATH="/lfs/local/0/jdunnmon/data_aug/firstaid/all_runs/logs"
 
-CUDA_VISIBLE_DEVICES=0
+CUDA_VISIBLE_DEVICES=1
 
-NET_NAME=GoogLe
+NET_NAME=VGG19
 EPOCHS=200
 
 EXP_NAME=hp_search_${NET_NAME}
@@ -24,7 +24,7 @@ for dec in 0.95 0.99
 do
 for l1 in 0
 do
-for bs in 64 128
+for bs in 32
 do
   echo "Running Case with LR = $lr, L2= $l2, DO = $dp, DEC= $dec, l1=$l1, BS=$bs"
   TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_$bs
