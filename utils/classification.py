@@ -422,6 +422,11 @@ class classifier:
         return loss_te, acc_te, preds, truths
         
     
+    def add_scalar_summary(self,val,name,it):
+        value = tf.summary.Summary.Value(tag=name, simple_value=val)
+        self.writer.add_summary(tf.summary.Summary(value=[value]),it)
+        
+        
     def train_model(self):
         """
         Loads model and trains.
@@ -453,18 +458,17 @@ class classifier:
                     acc_tr *= self.print_every
                 self.tr_loss.append(loss_tr)
                 self.tr_acc.append(acc_tr)
-
-                #summaries = [] 
-                #self.writer.add_summary(tf.summary.scalar("train_acc",acc_tr))
-                value = tf.summary.Summary.Value(tag="train_accuracy", simple_value=acc_tr)
-                self.writer.add_summary(tf.summary.Summary(value=[value]),iter)
-
-                #self.writer.add_summary(tf.summary.scalar("train_loss",loss_tr))
-
                 current_time = time.time()
+                elapsed_time = (current_time - start_time) / 60
+                
+                #adding TB summaries
+                self.add_scalar_summary(elapsed_time,"elapsed_time",iter)
+                self.add_scalar_summary(acc_tr,"train_accuracy",iter)
+                self.add_scalar_summary(loss_tr,"train_loss",iter)
+
                 statement = "\t"
                 statement += "Iter: " + str(iter) + " "
-                statement += "Time: " + str((current_time - start_time) / 60) + " "
+                statement += "Time: " + str(elapsed_time) + " "
                 statement += "Loss_tr: " + str(loss_tr) + " "
                 statement += "Acc_tr: " + str(acc_tr)
                 loss_tr = 0.0
@@ -476,8 +480,9 @@ class classifier:
                     statement += " Loss_val: " + str(loss_val)
                     statement += " Acc_val: "+str(acc_val)
 
-                 #   self.writer.add_summary(tf.summary.scalar("val_loss",loss_val))
-                 #   self.writer.add_summary(tf.summary.scalar("val_acc",acc_val))
+                    #adding TB summaries
+                    self.add_scalar_summary(acc_val,"val_accuracy",iter)
+                    self.add_scalar_summary(loss_val,"val_loss",iter)
 
                     if self.opts.bool_kappa:
                         statement += " Kappa: " + str(self.quadratic_kappa(preds, truths))
@@ -488,9 +493,6 @@ class classifier:
                         self.saver.save(self.sess, self.opts.path_model)
                 if self.opts.bool_display:
                     self.super_graph()
-                #summary_out = tf.summary.merge(summaries)
-                #import pdb; pdb.set_trace()
-                #self.writer.add_summary(summary_out,iter)
                 self.super_print(statement)
         if (not self.opts.path_validation) and self.opts.path_model:
             self.saver.save(self.sess, self.opts.path_model)

@@ -14,11 +14,11 @@ EPOCHS=200
 EXP_NAME=hp_search_${NET_NAME}
 START_DATE=`date +"%m_%d_%y"`
 
-for lr in 0.001 0.0001 0.00001
+for lr in 0.01 0.001 0.0001 0.00001
 do
 for dp in 0.9 1.0
 do
-for l2 in 0.0001 0.000001
+for l2 in 0.01 0.0001 0.000001
 do
 for dec in 0.95 0.99
 do
