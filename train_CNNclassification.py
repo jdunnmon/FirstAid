@@ -24,6 +24,7 @@ def main(args):
     # Experiment Specific Parameters (i.e. architecture)
     parser.add_argument("--name", dest="name", type=str, default="noname")
     parser.add_argument("--net", dest="network", type=str, default="GoogLe")
+    parser.add_argument("--optim", dest="optim", type=str, default="rmsprop")
     parser.add_argument("--nClass", dest="num_class", type=int, default=2)
     parser.add_argument("--nGPU", dest="num_gpu", type=int, default=1)
     

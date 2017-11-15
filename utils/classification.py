@@ -178,7 +178,7 @@ class classifier:
                 if name_img[0] == '.':
                     list_imgs.remove(name_img)
             self.X_te = list_imgs
-        optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every)
+        optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every,self.opts.optim)
         grads = optimizer.compute_gradients(self.cost)
         self.optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
