@@ -1,7 +1,11 @@
 import numpy as np
 import tensorflow as tf
+import sys
 
 from layers import *
+
+
+
 
 def get_L2_loss(reg_param, key="reg_variables"):
     """
@@ -47,10 +51,21 @@ def get_accuracy(logits, labels):
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
     return accuracy
 
-def get_optimizer(lr, decay, epoch_every):
+def get_optimizer(lr, decay, epoch_every,optim="rmsrop"):
     global_step = tf.Variable(0, trainable=False)
     starter_learning_rate = float(lr)
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                epoch_every, decay, staircase=True)
-    optimizer = tf.train.RMSPropOptimizer(learning_rate)#tf.train.AdamOptimizer(learning_rate)#
+    if optim == "yellowfin":
+        YELLOWFIN_PATH = '../../YellowFin/tuner_utils/'
+        sys.path.append(YELLOWFIN_PATH)
+        from yellowfin import YFOptimizer
+        optimizer = YFOptimizer()
+        print "Optimizing with Yellowfin"
+    elif optim == "rmsprop":
+        optimizer = tf.train.RMSPropOptimizer(learning_rate)
+        print "Optimizing with RMSProp"
+    elif optim == "adam":
+        optimizer = tf.train.AdamOptimizer(learning_rate)
+        print "Optimizing with Adam"
     return optimizer, global_step

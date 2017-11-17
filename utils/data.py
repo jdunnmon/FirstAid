@@ -10,6 +10,9 @@ import tensorflow as tf
 import socket
 import sys
 import time
+import random
+
+from keras.applications.resnet50 import preprocess_input as preprocess_input_keras_resnet50
 
 def find_data_shape(path_data):
     """
@@ -101,4 +104,32 @@ def data_augment(data_iter, data_seg=None, rand_seed=None):
     data_iter += add_rand
     if np.any(data_seg):
         return data_iter, data_seg
+    return data_iter
+
+def random_crop(im, cropping_style, image_size, depth):
+    # img is a 3d numpy array
+    if cropping_style == 'default':
+        im = np.array(np.resize(im,(image_size, image_size, depth)))
+    elif cropping_style == 'center':
+        pre_crop_size = image_size*3
+        im = np.array(np.resize(im,(pre_crop_size, pre_crop_size, depth)))
+        im = im[image_size:2*image_size,image_size:2*image_size,:]
+    elif cropping_style == 'random':
+        pre_crop_size = image_size*3
+        im = np.array(np.resize(im,(pre_crop_size, pre_crop_size, depth)))
+        start_indices = [0, image_size, 2*image_size]
+        x_start = random.choice(start_indices)
+        y_start = random.choice(start_indices)
+        im = im[y_start:y_start+image_size,x_start:x_start+image_size,:]
+    return im
+
+def data_format(data_iter,net=None):
+    if net == None:
+        data_iter = data_iter
+    elif net == "Keras_ResNet50":
+        import pdb; pdb.set_trace()
+        data_iter = 255.0*data_iter
+        data_iter_2 = np.append(data_iter, data_iter,axis=2)
+        data_iter_3 = np.append(data_iter_2, data_iter,axis=2)
+        data_iter = preprocess_input_keras_resnet50(data_iter_3)
     return data_iter

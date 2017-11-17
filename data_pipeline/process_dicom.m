@@ -30,13 +30,10 @@ function process_dicom(rootPath, pathToTrainImages, pathToTrainCSV, pathToTestIm
         yTop = mean_centroid(2) - radius;
         BW = imcrop(BW, [xLeft, yTop, 749, 749]);
         I = imcrop(I, [xLeft, yTop, 749, 749]);
-        I = double(I);
-        I = I-mean(I(:));
-        I = I/std(I(:),0,1);
-        maskWriteRoot = 'train_masks_cropped/';
-        imgWriteRoot = 'train_mammo_cropped/';
-        mkdir(writeDirectory, 'train_masks_cropped');
-        mkdir(writeDirectory, 'train_mammo_cropped');
+        maskWriteRoot = 'train_masks/';
+        imgWriteRoot = 'train_mammo/';
+        mkdir(writeDirectory, 'train_masks');
+        mkdir(writeDirectory, 'train_mammo');
         imwrite(BW, strcat(writeDirectory, strcat(maskWriteRoot, strcat(base_name, '.tif'))));
         imwrite(I, strcat(writeDirectory, strcat(imgWriteRoot, strcat(base_name, '.tif'))));
     end
@@ -71,13 +68,10 @@ function process_dicom(rootPath, pathToTrainImages, pathToTrainCSV, pathToTestIm
         yTop = mean_centroid(2) - radius;
         BW = imcrop(BW, [xLeft, yTop, 749, 749]);
         I = imcrop(I, [xLeft, yTop, 749, 749]);
-        I = double(I);
-        I = I-mean(I(:));
-        I = I/std(I(:),0,1);
-        maskWriteRoot = 'test_masks_cropped/';
-        imgWriteRoot = 'test_mammo_cropped/';
-        mkdir(writeDirectory, 'test_masks_cropped');
-        mkdir(writeDirectory, 'test_mammo_cropped');
+        maskWriteRoot = 'test_masks/';
+        imgWriteRoot = 'test_mammo/';
+        mkdir(writeDirectory, 'test_masks');
+        mkdir(writeDirectory, 'test_mammo');
         imwrite(BW, strcat(writeDirectory, strcat(maskWriteRoot, strcat(base_name, '.tif'))));
         imwrite(I, strcat(writeDirectory, strcat(imgWriteRoot, strcat(base_name, '.tif'))));
     end

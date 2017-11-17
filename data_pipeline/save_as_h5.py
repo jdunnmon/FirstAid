@@ -43,21 +43,22 @@ def get_valid_files(img_filenames, mask_filenames):
 
 # folder_path defines whether it is train, test, or validation, i.e. the name
 # cropping_style = ['default', 'random', 'center']
-def save_as_h5(root_path, folder_path, image_path, mask_path, label_dictionary, valid_filenames, cropping_style='default'):
-    path_prefix = join(root_path,folder_path)
-    if not isdir(path_prefix):
-        mkdir(path_prefix)
+def save_as_h5(data_path, root_path, folder_path, image_path, mask_path, label_dictionary, valid_filenames, cropping_style='default'):
+    write_path_prefix = join(root_path,folder_path)
+    #data_path_prefix = join(data_path, folder_path)
+    if not isdir(write_path_prefix):
+        mkdir(write_path_prefix)
     for fname in valid_filenames:
         #segment the filename
         patient_name = fname.split("_")[1]
-        directory = join(path_prefix,'P_'+patient_name)
+        directory = join(write_path_prefix,'P_'+patient_name)
         if not isdir(directory):
             mkdir(directory)
         #check if directory exists, makedir if it doesnt
         #open image
-        cur_image_path = join(join(root_path, image_path), fname)
+        cur_image_path = join(join(data_path, image_path), fname)
 
-        cur_mask_path = join(join(root_path, mask_path), fname)
+        cur_mask_path = join(join(data_path, mask_path), fname)
         im = Image.open(cur_image_path)
         # if cropping_style == 'default':
         #     im = np.array(im.resize((IMAGE_SIZE, IMAGE_SIZE)))
@@ -79,7 +80,7 @@ def save_as_h5(root_path, folder_path, image_path, mask_path, label_dictionary, 
         #open mask
         mask = Image.open(cur_mask_path)
         mask = np.array(mask)
-        mask = mask.astype(np.int64)
+        mask = mask.astype(np.uint64)
 
         #get label
         label = label_dictionary[fname]
