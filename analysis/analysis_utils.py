@@ -1,6 +1,8 @@
+from __future__ import print_function  # Only needed for Python 2
 import numpy as np
 from collections import defaultdict
 import os
+
 
 def is_number(s):
     try:
@@ -43,8 +45,10 @@ def get_log_paths(root):
         for fil in files:
             if "internal" in fil:
                 lst.append(os.path.join(subdir,fil))
-                names.append(os.path.split(subdir)[1])
-    return lst, names
+                namesplit = os.path.split(subdir)
+                names.append(namesplit[1])    #getting experiment name
+    exp_name = os.path.split(namesplit[0])[1]
+    return lst, names, exp_name, 
 
 
 def create_master_dict(log_paths,run_names):
@@ -69,3 +73,23 @@ def find_max_by_param(all_dict,param):
             key = ky
 
     return key, max_val
+
+
+def remove_prefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text  # or whatever
+
+def parse_param_vals(log,exp_name):
+    params = {}
+    param_lst = remove_prefix(log,exp_name+'_')
+    words = param_lst.split('_')
+    for ii,word in enumerate(words):
+        if ii % 2:
+            params[words[ii-1]] = words[ii]
+    return params
+
+def print_dict(dct,f):
+    statement = str()
+    for ky in dct.keys():
+        print(str(ky)+': '+str(dct[ky]),file=f)
