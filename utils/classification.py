@@ -149,12 +149,7 @@ class classifier:
         self.prob = tf.nn.softmax(self.pred)
         self.acc = get_accuracy(self.pred, self.yTe)
 
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-        K.set_session(self.sess)
-        graph  = self.sess.graph
-        tbpath,_ = os.path.split(self.opts.path_log)
-        tbdir = join(tbpath,"tbout") 
-        self.writer = tf.summary.FileWriter(tbdir, graph)
+        
  
         # Listing the data.
         if self.opts.path_train:
@@ -237,6 +232,13 @@ class classifier:
 
         self.dataXX = np.zeros(xTr_size, dtype=np.float32)
         self.dataYY = np.zeros(yTr_size, dtype=np.int64)
+        
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        K.set_session(self.sess)
+        graph  = self.sess.graph
+        tbpath,_ = os.path.split(self.opts.path_log)
+        tbdir = join(tbpath,"tbout") 
+        self.writer = tf.summary.FileWriter(tbdir, graph)
 
     def average_accuracy(self, logits, truth):
         prediction = np.argmax(logits, axis=1)

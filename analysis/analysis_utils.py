@@ -68,8 +68,12 @@ def find_max_by_param(all_dict,param):
     """
     max_val = 0
     for ii,ky in enumerate(all_dict.keys()):
-        if all_dict[ky][param]>max_val:
-            max_val = all_dict[ky][param]
+        if all_dict[ky][param] != []:
+            max_temp = max(all_dict[ky][param])
+        else:
+            max_temp = -1
+        if max_temp>max_val:
+            max_val = max_temp
             key = ky
 
     return key, max_val

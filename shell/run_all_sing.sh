@@ -15,7 +15,7 @@ EPOCHS=30
 EXP_NAME=hp_search_${NET_NAME}_optim_test
 START_DATE=`date +"%m_%d_%y"`
 
-for opt in adam rmsprop yellowfin
+for opt in rmsprop
 do
 for lr in 0.001 
 do

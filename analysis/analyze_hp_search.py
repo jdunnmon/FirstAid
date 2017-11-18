@@ -28,17 +28,17 @@ max_trainacc_trial, max_trainacc = find_max_by_param(all_log_dict,'Train Accurac
 #writing best hps to output file
 f = open(outfile, 'w')
 
-print("Best Test Accuracy = %.2f" % max_testacc[0],file=f)
+print("Best Test Accuracy = %.2f" % max_testacc,file=f)
 print("Best Parameters for Test Accuracy:",file=f)
 print_dict(parse_param_vals(max_testacc_trial, exp_name),f=f)
 print("\n")
 
-print("Best Val Accuracy = %.2f" % max_valacc[0],file=f)
+print("Best Val Accuracy = %.2f" % max_valacc,file=f)
 print("Best Parameters for Val Accuracy:",file=f)
 print_dict(parse_param_vals(max_valacc_trial, exp_name),f=f)
 print("\n")
 
-print("Best Train Accuracy = %.2f" % max_trainacc[0],file=f)
+print("Best Train Accuracy = %.2f" % max_trainacc,file=f)
 print("Best Parameters for Train Accuracy:",file=f)
 print_dict(parse_param_vals(max_trainacc_trial,exp_name),f=f)
 

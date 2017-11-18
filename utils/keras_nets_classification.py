@@ -24,6 +24,7 @@ def Keras_ResNet50_Net(layer,is_training,class_num,batch_size, keep_prob=1.0, na
     model = ResNet50(include_top=False, weights=initial,
                  pooling='max', input_shape=input_shape)
     pred = Dense(class_num, activation='sigmoid')(model.layers[-1].output)
+    model = Model(input=model.input, output=pred)
      
     return pred
 
