@@ -24,9 +24,10 @@ def main(args):
     # Experiment Specific Parameters (i.e. architecture)
     parser.add_argument("--name", dest="name", type=str, default="noname")
     parser.add_argument("--net", dest="network", type=str, default="GoogLe")
+    parser.add_argument("--optim", dest="optim", type=str, default="rmsprop")
     parser.add_argument("--nClass", dest="num_class", type=int, default=2)
     parser.add_argument("--nGPU", dest="num_gpu", type=int, default=1)
-    
+
     # Hyperparameters
     parser.add_argument("--lr", dest="lr", type=float, default=0.001)
     parser.add_argument("--dec", dest="lr_decay", type=float, default=1.0)
@@ -43,6 +44,11 @@ def main(args):
     parser.add_argument("--bConf", dest="bool_confusion", type=int, default=0)
     parser.add_argument("--bKappa", dest="bool_kappa", type=int, default=0)
 
+    # Cropping Style - Ann
+    parser.add_argument("--crop", dest="cropping_style", type=str, default='default')
+    parser.add_argument("--xSize", dest="image_size", type=int, default=224)
+    parser.add_argument("--nChannels", dest="num_channels", type=int, default=1)
+
     # Creating Object
     opts = parser.parse_args(args[1:])
     CNN_obj = classifier(opts)
@@ -52,7 +58,7 @@ def main(args):
 
     # We're done.
     return 0
-    
+
 
 if __name__ == '__main__':
     main(sys.argv)

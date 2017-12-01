@@ -54,6 +54,9 @@ class DDSMDataOfficial:
 
     def load_mask_names(self):
         f = self.load_file_names(join(self.root_path,self.mask_path))
+        print "root path ", self.root_path
+        print "mask path ", self.mask_path
+        print "FROM LOAD MASK NAMES SIZE: ", len(f)
         return f
 
     def load_test_mask_names(self):
@@ -68,6 +71,7 @@ class DDSMDataOfficial:
             f = [a for a in self.img_names if a in self.msk_names and 'CC' in a]
             return f
         f = [a for a in self.img_names if a in self.msk_names]
+        print "FROM GET VALID LABELS SIZE: ", len(f)
         return f
 
     def get_test_valid_labels(self):
@@ -85,6 +89,7 @@ class DDSMDataOfficial:
                                                train_size=train_size, random_state=rand_seed)
         lab_dict = self.load_labels()
         imgs = np.array(self.val_names)
+        print "IMGS size: ", len(imgs)
         if imgs[0] == '.DS_Store':
             imgs = imgs[1:]
         labs = np.array([lab_dict[a] for a in imgs])
@@ -195,4 +200,4 @@ class DDSMDataOfficial:
         x_train, y_train, x_val, y_val = self.create_train_splits(n_splits, train_size, val_size, rand_seed)
         x_test, y_test = self.create_test()
         self.write_splits(x_train, x_val, x_test, log_dir, suffix)
-        self.write_split_stats(train_size, val_size, len(x_train), len(x_val), len(x_test), log_dir)
+        #self.write_split_stats(train_size, val_size, len(x_train), len(x_val), len(x_test), log_dir)

@@ -1,6 +1,7 @@
 import matplotlib.animation as animation
 import h5py
 import numpy as np
+import os
 from os import listdir, remove, mkdir
 from os.path import isfile, join, isdir
 import scipy
@@ -14,8 +15,25 @@ import time
 
 from layers import *
 from nets_classification import *
+from keras_nets_classification import *
 from data import *
 from ops import *
+
+from keras import backend as K
+
+def super_print(path, statement):
+    """
+    This basically prints everything in statement.
+    We'll print to stdout and path_log.
+
+    """
+    sys.stdout.write(statement + '\n')
+    sys.stdout.flush()
+    f = open(path, 'a')
+    f.write(statement + '\n')
+    f.close()
+    return 0
+
 
 def create_exec_statement_test(opts):
     """
@@ -95,15 +113,23 @@ class classifier:
         INPUTS:
         - opts: (object) command line arguments from argparser
         """
+        #print "OPTS FROM COMMAND LINE", opts
         self.opts = opts
-
+        #print "cropping style", self.opts.cropping_style
+        self.matrix_size = self.opts.image_size
+        self.num_channels = self.opts.num_channels
         # Creating the Placeholders.
-        if self.opts.path_train:
-            self.matrix_size, self.num_channels = find_data_shape(self.opts.path_train)
-        elif self.opts.path_test:
-            self.matrix_size, self.num_channels = find_data_shape(self.opts.path_test)
-        else:
-            self.matrix_size, self.num_channels = 224,1
+        # if self.opts.path_train:
+        #     self.matrix_size, self.num_channels = find_data_shape(self.opts.path_train)
+        # elif self.opts.path_test:
+        #     self.matrix_size, self.num_channels = find_data_shape(self.opts.path_test)
+        # else:
+        #     self.matrix_size, self.num_channels = 224,1
+
+        #adjusting for specific networks
+        if self.opts.network == "Keras_ResNet50":
+            num_channels = 3
+
         xTe_size = [1, self.matrix_size, self.matrix_size, self.num_channels]
         yTe_size = [1]
         each_bs  = self.opts.batch_size
@@ -125,6 +151,15 @@ class classifier:
         self.cost = self.ce_loss + self.L2_loss + self.L1_loss
         self.prob = tf.nn.softmax(self.pred)
         self.acc = get_accuracy(self.pred, self.yTe)
+        self.cropping_style = self.opts.cropping_style
+
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        K.set_session(self.sess)
+        graph  = self.sess.graph
+        tbpath,_ = os.path.split(self.opts.path_log)
+        tbdir = join(tbpath,"tbout")
+        self.writer = tf.summary.FileWriter(tbdir, graph)
+        print "Tensorboard log directory: ", tbdir
 
         # Listing the data.
         if self.opts.path_train:
@@ -148,7 +183,7 @@ class classifier:
                 if name_img[0] == '.':
                     list_imgs.remove(name_img)
             self.X_te = list_imgs
-        optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every)
+        optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every,self.opts.optim)
         grads = optimizer.compute_gradients(self.cost)
         self.optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
@@ -208,12 +243,10 @@ class classifier:
         self.dataXX = np.zeros(xTr_size, dtype=np.float32)
         self.dataYY = np.zeros(yTr_size, dtype=np.int64)
 
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-
     def average_accuracy(self, logits, truth):
         prediction = np.argmax(logits, axis=1)
         return np.mean(0.0 + (prediction == truth))
-    
+
     def confusion_matrix(self, logits, truth):
         prediction = np.argmax(logits, axis=1)
         truth = truth.astype(np.int64)
@@ -222,7 +255,7 @@ class classifier:
         for i in range(len(truth)):
             O[truth[i], prediction[i]] += 1
         return O
-    
+
     def quadratic_kappa(self, logits, truth):
         prediction = np.argmax(logits, axis=1)
         truth = truth.astype(np.int64)
@@ -245,7 +278,7 @@ class classifier:
         E = np.sum(O) * E / np.sum(E)
         kappa = 1 - np.sum(W * O) / np.sum(W * E)
         return kappa
-    
+
     def super_graph(self, save=True, name='0'):
         self.plot_accuracy.cla()
         self.plot_loss.cla()
@@ -266,7 +299,7 @@ class classifier:
         self.plot_loss.set_xlabel('Epoch')
         self.plot_loss.set_ylabel('-log(P(correct_class))')
         self.plot_loss.set_title('CrossEntropy Loss')
-        
+
         if self.opts.path_visualization and save:
             path_save = join(self.opts.path_visualization, 'accuracy')
             if not isdir(path_save):
@@ -304,11 +337,12 @@ class classifier:
             while(True):
                 try:
                     with h5py.File(join(self.opts.path_train, self.X_tr[ind], img_filename)) as hf:
-                        data_iter = np.array(hf.get('data'))
+                        data_iter = data_format(np.array(hf.get('data')),net=self.opts.network)
                         data_label = np.array(hf.get('label'))
                     break
                 except:
                     time.sleep(0.001)
+            data_iter = random_crop(data_iter, self.cropping_style, 224, 1)
             data_iter = data_augment(data_iter)
             self.dataXX[iter_data,:,:,:] = data_iter
             self.dataYY[iter_data]   = data_label
@@ -327,7 +361,7 @@ class classifier:
         while(True):
             try:
                 with h5py.File(path_file) as hf:
-                    dataXX[0,:,:,:] = np.array(hf.get('data'))
+                    dataXX[0,:,:,:] = data_format(np.array(hf.get('data')),net=self.opts.network)
                     break
             except:
                 time.sleep(0.001)
@@ -348,7 +382,7 @@ class classifier:
         while(True):
             try:
                 with h5py.File(path_file) as hf:
-                    dataXX[0,:,:,:] = np.array(hf.get('data'))
+                    dataXX[0,:,:,:] = random_crop(data_format(np.array(hf.get('data')),net=self.opts.network), self.cropping_style, 224, 1)
                     dataYY[0]   = np.array(hf.get('label'))
                     break
             except:
@@ -392,8 +426,13 @@ class classifier:
                     preds = np.concatenate((preds, pred_iter_iter), axis=0)
                     truths = np.concatenate((truths, truth_iter_iter), axis=0)
         return loss_te, acc_te, preds, truths
-        
-    
+
+
+    def add_scalar_summary(self,val,name,it):
+        value = tf.summary.Summary.Value(tag=name, simple_value=val)
+        self.writer.add_summary(tf.summary.Summary(value=[value]),it)
+
+
     def train_model(self):
         """
         Loads model and trains.
@@ -426,10 +465,18 @@ class classifier:
                 self.tr_loss.append(loss_tr)
                 self.tr_acc.append(acc_tr)
                 current_time = time.time()
+                elapsed_time = (current_time - start_time) / 60
+
+                #adding TB summaries
+                self.add_scalar_summary(elapsed_time,"elapsed_time",iter)
+                self.add_scalar_summary(acc_tr,"train_accuracy",iter)
+                self.add_scalar_summary(loss_tr,"train_loss",iter)
+
                 statement = "\t"
                 statement += "Iter: " + str(iter) + " "
-                statement += "Time: " + str((current_time - start_time) / 60) + " "
-                statement += "Loss_tr: " + str(loss_tr)
+                statement += "Time: " + str(elapsed_time) + " "
+                statement += "Loss_tr: " + str(loss_tr) + " "
+                statement += "Acc_tr: " + str(acc_tr)
                 loss_tr = 0.0
                 acc_tr = 0.0
                 if self.opts.path_validation:
@@ -437,6 +484,12 @@ class classifier:
                     self.val_loss.append(loss_val)
                     self.val_acc.append(acc_val)
                     statement += " Loss_val: " + str(loss_val)
+                    statement += " Acc_val: "+str(acc_val)
+
+                    #adding TB summaries
+                    self.add_scalar_summary(acc_val,"val_accuracy",iter)
+                    self.add_scalar_summary(loss_val,"val_loss",iter)
+
                     if self.opts.bool_kappa:
                         statement += " Kappa: " + str(self.quadratic_kappa(preds, truths))
                     if self.opts.bool_confusion:
@@ -449,7 +502,7 @@ class classifier:
                 self.super_print(statement)
         if (not self.opts.path_validation) and self.opts.path_model:
             self.saver.save(self.sess, self.opts.path_model)
-                
+
 
     def test_model(self):
         """
@@ -461,6 +514,21 @@ class classifier:
         start_time = time.time()
         loss_te = 0.0
         self.saver.restore(self.sess, self.opts.path_model)
+        loss_tr, acc_tr,preds,truths = self.test_all(self.opts.path_train)
+
+        class_balance = float(np.sum(truths))/len(truths)
+        acc_maj_class = max(class_balance,1-class_balance)
+        self.super_print("Train Accuracy: "+str(acc_tr))
+        self.super_print("Train Loss: "+str(loss_tr))
+        loss_val, acc_val,preds,truths = self.test_all(self.opts.path_validation)
+        self.super_print("Validation Accuracy: "+str(acc_val))
+        self.super_print("Validation Loss: "+str(loss_val))
+        loss_test, acc_test,preds,truths = self.test_all(self.opts.path_test)
+        self.super_print("Test Accuracy: "+str(acc_test))
+        self.super_print("Test Loss: "+str(loss_test))
+
+        self.super_print("Majority Classifier Accuracy:"+str(acc_maj_class))
+        return acc_tr, acc_val, acc_test
 
     def do_inference(self):
         """
@@ -484,6 +552,6 @@ class classifier:
                 h5f = h5py.File(path_file, 'a')
                 h5f.create_dataset('label_pred', data=prob)
                 h5f.close()
-            
-            
-                
+
+
+
