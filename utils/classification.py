@@ -18,6 +18,23 @@ from nets_classification import *
 from keras_nets_classification import *
 from data import *
 from ops import *
+from dense_net_layers import Dense_Net
+
+from keras import backend as K
+
+def super_print(path, statement):
+    """
+    This basically prints everything in statement.
+    We'll print to stdout and path_log.
+
+    """
+    sys.stdout.write(statement + '\n')
+    sys.stdout.flush()
+    f = open(path, 'a')
+    f.write(statement + '\n')
+    f.close()
+    return 0
+
 
 from keras import backend as K
 
@@ -143,8 +160,14 @@ class classifier:
         self.keep_prob = tf.placeholder(tf.float32)
 
         # Creating the Network for Testing
-        exec_statement = create_exec_statement_test(opts)
-        exec exec_statement
+        if self.opts.network != "Dense":
+            exec_statement = create_exec_statement_test(opts)
+            exec exec_statement
+        else
+            # invoke call for Dense_NET
+            first_output_features = self.opts.growth_rate * 2
+            layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // total_blocks
+            self.pred = Dense_Net(xTe, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
         self.L2_loss = get_L2_loss(self.opts.l2)
         self.L1_loss = get_L1_loss(self.opts.l1)
         self.ce_loss = get_ce_loss(self.pred, self.yTe)

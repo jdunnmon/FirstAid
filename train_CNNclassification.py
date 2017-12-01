@@ -23,7 +23,7 @@ def main(args):
 
     # Experiment Specific Parameters (i.e. architecture)
     parser.add_argument("--name", dest="name", type=str, default="noname")
-    parser.add_argument("--net", dest="network", type=str, default="GoogLe")
+    parser.add_argument("--net", dest="network", type=str, default="Dense")
     parser.add_argument("--optim", dest="optim", type=str, default="rmsprop")
     parser.add_argument("--nClass", dest="num_class", type=int, default=2)
     parser.add_argument("--nGPU", dest="num_gpu", type=int, default=1)
@@ -48,6 +48,14 @@ def main(args):
     parser.add_argument("--crop", dest="cropping_style", type=str, default='default')
     parser.add_argument("--xSize", dest="image_size", type=int, default=224)
     parser.add_argument("--nChannels", dest="num_channels", type=int, default=1)
+
+    # Parameters/Hyper-parameteres for DenseNet
+    parser.add_argument("--depth", type=int, default=40)
+    # reduction Theta at transition layer for DenseNets-BC models
+    parser.add_argument("--reduction", type=float, default=0.5)
+    parser.add_argument("--total_blocks", type=int, default=3)
+    parser.add_argument("--growth_rate", type=int, default=12)
+
 
     # Creating Object
     opts = parser.parse_args(args[1:])
