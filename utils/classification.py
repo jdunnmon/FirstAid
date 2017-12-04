@@ -18,7 +18,7 @@ from nets_classification import *
 from keras_nets_classification import *
 from data import *
 from ops import *
-from dense_net_layers import Dense_Net
+from dense_net_layers import *
 
 from keras import backend as K
 
@@ -130,7 +130,8 @@ class classifier:
         INPUTS:
         - opts: (object) command line arguments from argparser
         """
-        #print "OPTS FROM COMMAND LINE", opts
+        print "FROM INIT: NETWORK TYPE: ", opts.network
+        print "OPTS FROM COMMAND LINE", opts
         self.opts = opts
         #print "cropping style", self.opts.cropping_style
         self.matrix_size = self.opts.image_size
@@ -163,13 +164,17 @@ class classifier:
         if self.opts.network != "Dense":
             exec_statement = create_exec_statement_test(opts)
             exec exec_statement
-        else
+        else:
             # invoke call for Dense_NET
             first_output_features = self.opts.growth_rate * 2
-            layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // total_blocks
-            self.pred = Dense_Net(xTe, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+            layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
+            # YO ANN MAKE SURE YOU ARE PASSING IN THE RIGHT THINGS
+            # WHAT ABOUT IS_TRAINING HERE
+            self.pred = Dense_Net(self.xTe, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
         self.L2_loss = get_L2_loss(self.opts.l2)
         self.L1_loss = get_L1_loss(self.opts.l1)
+        print "SHAPE OF self.pred ", self.pred.get_shape().as_list()
+        print "SHAPE OF self.yTe ", self.yTe.get_shape().as_list()
         self.ce_loss = get_ce_loss(self.pred, self.yTe)
         self.cost = self.ce_loss + self.L2_loss + self.L1_loss
         self.prob = tf.nn.softmax(self.pred)
@@ -220,8 +225,13 @@ class classifier:
         for i in xrange(self.opts.num_gpu):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('gpu%d' % i) as scope:
-                    exec_statement = create_exec_statement_train(opts)
-                    exec exec_statement
+                    if self.opts.network != "Dense":
+                        exec_statement = create_exec_statement_train(opts)
+                        exec exec_statement
+                    else:
+                        first_output_features = self.opts.growth_rate * 2
+                        layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
+                        pred = Dense_Net(self.xTr, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
                     loss = get_ce_loss(pred, multi_outputs[i])
                     loss_multi.append(loss)
                     cost = loss + self.L2_loss + self.L1_loss
@@ -234,8 +244,13 @@ class classifier:
         if self.opts.num_gpu == 0:
             i = 0
             with tf.name_scope('cpu0') as scope:
-                exec_statement = create_exec_statement_train(opts)
-                exec exec_statement
+                if self.opts.network != "Dense":
+                    exec_statement = create_exec_statement_train(opts)
+                    exec exec_statement
+                else:
+                    first_output_features = self.opts.growth_rate * 2
+                    layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
+                    pred = Dense_Net(self.xTr, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
                 loss = get_ce_loss(pred, multi_outputs[i])
                 loss_multi.append(loss)
                 cost = loss + self.L2_loss + self.L1_loss
@@ -354,23 +369,32 @@ class classifier:
         - i: (int) iteration
         """
         # Filling in the data.
+        self.super_print("BEGINNING TRAIN ONE ITER "+str(iter))
         ind_list = np.random.choice(range(len(self.X_tr)), self.opts.batch_size, replace=True)
+        self.super_print("SIZE OF INDEX LIST "+str(len(ind_list)))
         for iter_data, ind in enumerate(ind_list):
             img_filename = np.random.choice(listdir(join(self.opts.path_train, self.X_tr[ind])))
+            complete_path = join(self.opts.path_train, self.X_tr[ind], img_filename)
+            self.super_print(complete_path)
             while(True):
                 try:
                     with h5py.File(join(self.opts.path_train, self.X_tr[ind], img_filename)) as hf:
+                        #self.super_print("OPENING H5 FILE "+self.opts.path_train)
+                        self.super_print("INNER ITERATION "+str(iter_data))
                         data_iter = data_format(np.array(hf.get('data')),net=self.opts.network)
                         data_label = np.array(hf.get('label'))
                     break
                 except:
                     time.sleep(0.001)
+            self.super_print("ABOUT TO DO CROP AND AUGMENT")
             data_iter = random_crop(data_iter, self.cropping_style, 224, 1)
             data_iter = data_augment(data_iter)
             self.dataXX[iter_data,:,:,:] = data_iter
             self.dataYY[iter_data]   = data_label
         feed = {self.xTr:self.dataXX, self.is_training:1, self.yTr:self.dataYY, self.keep_prob:self.opts.keep_prob}
+        self.super_print("ABOUT TO CALL SESSION RUN")
         _, loss_iter, acc_iter = self.sess.run((self.optimizer, self.loss_multi, self.acc_multi), feed_dict=feed)
+        self.super_print("FINISHED CALLING SESSION RUN")
         return loss_iter, acc_iter
 
     def inference_one_iter(self, path_file):
@@ -477,8 +501,11 @@ class classifier:
         # Training
         self.super_print("Let's start the training!")
         loss_min = 1000000
+        self.super_print("ABOUT TO ENTIRE LOOP")
         for iter in range(self.iter_count):
+            self.super_print("BEGINNING ITERATION: "+str(iter))
             loss_temp, acc_temp = self.train_one_iter(iter)
+            self.super_print("RETURNED FROM TRAIN ONE ITER: "+str(iter))
             loss_tr += loss_temp / self.print_every
             acc_tr += acc_temp / self.print_every
             if ((iter)%self.print_every) == 0 or iter == self.iter_count-1:

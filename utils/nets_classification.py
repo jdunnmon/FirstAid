@@ -168,6 +168,7 @@ def GoogLe_Net(layer, is_training, class_num, batch_size, keep_prob=1.0, name="G
     - keep_prob: (float) probability to keep during dropout.
     - name: (str) the name of the network
     """
+    print "SHAPE OF input layer to GoogLe Net ", layer.get_shape().as_list()
     # Conv1
     layer = conv2d_bn_relu(layer, is_training, 7, 64, stride=2, name=name+"_conv1")
     layer = max_pool(layer, k=3, stride=2)
@@ -194,6 +195,7 @@ def GoogLe_Net(layer, is_training, class_num, batch_size, keep_prob=1.0, name="G
     layer = tf.nn.avg_pool(layer, ksize=[1,size_pool,size_pool,1], strides=[1,1,1,1], padding='VALID')
     layer = tf.nn.dropout(layer, keep_prob)
     layer = dense_w_bias(layer, class_num, name=name+'_output')
+    print "SHAPE OF GoogLe Net LAST LAYER ", layer.get_shape().as_list()
     return layer
 
 def sparse_GoogLe_Net(layer, is_training, class_num, batch_size, keep_prob=1.0, name="GoogLe_Net"):

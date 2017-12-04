@@ -9,6 +9,7 @@ def main(args):
     INPUTS:
     - args: (list of strings) command line arguments
     """
+    print "I am in main"
     # Reading command line arguments into parser.
     parser = argparse.ArgumentParser(description = "Do CNN Segmentation.")
 
@@ -23,7 +24,7 @@ def main(args):
 
     # Experiment Specific Parameters (i.e. architecture)
     parser.add_argument("--name", dest="name", type=str, default="noname")
-    parser.add_argument("--net", dest="network", type=str, default="Dense")
+    parser.add_argument("--net", dest="network", type=str, default="GoogLe")
     parser.add_argument("--optim", dest="optim", type=str, default="rmsprop")
     parser.add_argument("--nClass", dest="num_class", type=int, default=2)
     parser.add_argument("--nGPU", dest="num_gpu", type=int, default=1)
@@ -58,7 +59,9 @@ def main(args):
 
 
     # Creating Object
+
     opts = parser.parse_args(args[1:])
+    print "YO YO YO"
     CNN_obj = classifier(opts)
     CNN_obj.train_model() #Train/Validate the Model
     CNN_obj.test_model() #Test the Model.

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #EXEC_SCRIPT=/lfs/local/0/jdunnmon/repos/FirstAid/train_CNNclassification.py
 EXEC_SCRIPT=/home/annhe/Projects/tandaExperiment/FirstAid_Jared/FirstAid/train_CNNclassification.py
 #TRAIN_PATH_ROOT="/lfs/local/0/jdunnmon/data_aug/ddsm-data/ann_preproc/h5_data_all/"
@@ -7,6 +8,15 @@ PATH_TRAIN="$TRAIN_PATH_ROOT/h5_train_set$DATA_SUF"
 PATH_VAL="$TRAIN_PATH_ROOT/h5_val_set$DATA_SUF"
 PATH_TEST="$TRAIN_PATH_ROOT/h5_test_set$DATA_SUF"
 OUTPUT_PATH="/scratch/users/annhe/log_runs"
+=======
+EXEC_SCRIPT=/lfs/local/0/jdunnmon/repos/FirstAid/train_CNNclassification.py
+TRAIN_PATH_ROOT="/lfs/local/0/jdunnmon/data_aug/ddsm-data/ann_preproc/h5_data_all/"
+DATA_SUF="_all"
+PATH_TRAIN="$TRAIN_PATH_ROOT/h5_train_set$DATA_SUF"
+PATH_VAL="$TRAIN_PATH_ROOT/h5_val_set$DATA_SUF"
+PATH_TEST="$TRAIN_PATH_ROOT/h5_test_set$DATA_SUF"
+OUTPUT_PATH="/lfs/local/0/jdunnmon/data_aug/firstaid/all_runs/logs"
+>>>>>>> ff6ba3e9f2898fc566b0c8ccc3d5edb5aeea1fd2
 
 CUDA_VISIBLE_DEVICES=0
 
@@ -15,6 +25,7 @@ EPOCHS=200
 
 EXP_NAME=hp_search_${NET_NAME}
 START_DATE=`date +"%m_%d_%y"`
+<<<<<<< HEAD
 crop='random'
 xSize=224
 nChannels=1
@@ -22,6 +33,12 @@ nChannels=1
 for opt in adam
 do
 for lr in 0.01 0.001 0.0001
+=======
+
+for opt in adam 
+do
+for lr in 0.01 0.001 0.0001 
+>>>>>>> ff6ba3e9f2898fc566b0c8ccc3d5edb5aeea1fd2
 do
 for dp in 0.9 1.0
 do
@@ -45,7 +62,11 @@ do
   echo "Saving log to '$LOGFILE'"
 
   #source set_env.sh
+<<<<<<< HEAD
   python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 1 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --optim $opt --crop $crop --xSize $xSize --nChannels $nChannels --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
+=======
+  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 1 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --optim $opt --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
+>>>>>>> ff6ba3e9f2898fc566b0c8ccc3d5edb5aeea1fd2
  done
  done
  done
@@ -54,4 +75,8 @@ do
  done
  done
 
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> ff6ba3e9f2898fc566b0c8ccc3d5edb5aeea1fd2

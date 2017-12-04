@@ -1,16 +1,16 @@
 EXEC_SCRIPT=/Users/annhe/Projects/tandaExperiment/FirstAid/train_CNNclassification.py
 
 #TRAIN_PATH_ROOT="/Users/annhe/Projects/tandaExperiment/ddsm-h5-750/"
-TRAIN_PATH_ROOT="/scratch/users/annhe/ddsm-h5-750/"
+TRAIN_PATH_ROOT="/Volumes/Ann_He_2/ddsm-data-h5"
 DATA_SUF=""
 PATH_TRAIN="$TRAIN_PATH_ROOT/h5_train_set$DATA_SUF"
 PATH_VAL="$TRAIN_PATH_ROOT/h5_val_set$DATA_SUF"
 PATH_TEST="$TRAIN_PATH_ROOT/h5_test_set$DATA_SUF"
-OUTPUT_PATH="/scratch/users/annhe/log_runs"
+OUTPUT_PATH="/Volumes/Ann_He_2/tanda_logs/log_runs"
 
 CUDA_VISIBLE_DEVICES=0
 
-NET_NAME=GoogLe
+NET_NAME=Dense
 EPOCHS=30
 
 EXP_NAME=hp_search_${NET_NAME}_optim_test
@@ -20,7 +20,7 @@ xSize=224
 nChannels=1
 
 # removed yellowfin from opt
-for opt in adam rmsprop
+for opt in adam
 do
 for lr in 0.001
 do
@@ -46,7 +46,7 @@ do
   echo "Saving log to '$LOGFILE'"
 
   #source set_env.sh
-  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 1 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --optim $opt --crop $crop --xSize $xSize --nChannels $nChannels --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
+  python $EXEC_SCRIPT --pTrain $PATH_TRAIN --pVal $PATH_VAL --pTest $PATH_TEST --pModel $PATH_SAVE --pVis $PATH_VIS --pLog $PATH_LOG --name $EXP_NAME --net $NET_NAME --nClass 2 --nGPU 0 --lr $lr --dec $dec --do $dp --l2 $l2 --l1 $l1 --bs $bs --ep $EPOCHS --optim $opt --crop $crop --xSize $xSize --nChannels $nChannels --time 1440 --bLo 0 --bDisp 0 2>&1 | tee $LOGFILE
  done
  done
  done
