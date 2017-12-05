@@ -369,32 +369,32 @@ class classifier:
         - i: (int) iteration
         """
         # Filling in the data.
-        self.super_print("BEGINNING TRAIN ONE ITER "+str(iter))
+        #self.super_print("BEGINNING TRAIN ONE ITER "+str(iter))
         ind_list = np.random.choice(range(len(self.X_tr)), self.opts.batch_size, replace=True)
-        self.super_print("SIZE OF INDEX LIST "+str(len(ind_list)))
+        #self.super_print("SIZE OF INDEX LIST "+str(len(ind_list)))
         for iter_data, ind in enumerate(ind_list):
             img_filename = np.random.choice(listdir(join(self.opts.path_train, self.X_tr[ind])))
-            complete_path = join(self.opts.path_train, self.X_tr[ind], img_filename)
-            self.super_print(complete_path)
+            #complete_path = join(self.opts.path_train, self.X_tr[ind], img_filename)
+            #self.super_print(complete_path)
             while(True):
                 try:
                     with h5py.File(join(self.opts.path_train, self.X_tr[ind], img_filename)) as hf:
                         #self.super_print("OPENING H5 FILE "+self.opts.path_train)
-                        self.super_print("INNER ITERATION "+str(iter_data))
+                        #self.super_print("INNER ITERATION "+str(iter_data))
                         data_iter = data_format(np.array(hf.get('data')),net=self.opts.network)
                         data_label = np.array(hf.get('label'))
                     break
                 except:
                     time.sleep(0.001)
-            self.super_print("ABOUT TO DO CROP AND AUGMENT")
+            #self.super_print("ABOUT TO DO CROP AND AUGMENT")
             data_iter = random_crop(data_iter, self.cropping_style, 224, 1)
             data_iter = data_augment(data_iter)
             self.dataXX[iter_data,:,:,:] = data_iter
             self.dataYY[iter_data]   = data_label
         feed = {self.xTr:self.dataXX, self.is_training:1, self.yTr:self.dataYY, self.keep_prob:self.opts.keep_prob}
-        self.super_print("ABOUT TO CALL SESSION RUN")
+        #self.super_print("ABOUT TO CALL SESSION RUN")
         _, loss_iter, acc_iter = self.sess.run((self.optimizer, self.loss_multi, self.acc_multi), feed_dict=feed)
-        self.super_print("FINISHED CALLING SESSION RUN")
+        #self.super_print("FINISHED CALLING SESSION RUN")
         return loss_iter, acc_iter
 
     def inference_one_iter(self, path_file):
@@ -501,11 +501,11 @@ class classifier:
         # Training
         self.super_print("Let's start the training!")
         loss_min = 1000000
-        self.super_print("ABOUT TO ENTIRE LOOP")
+        #self.super_print("ABOUT TO ENTIRE LOOP")
         for iter in range(self.iter_count):
-            self.super_print("BEGINNING ITERATION: "+str(iter))
+            #self.super_print("BEGINNING ITERATION: "+str(iter))
             loss_temp, acc_temp = self.train_one_iter(iter)
-            self.super_print("RETURNED FROM TRAIN ONE ITER: "+str(iter))
+            #self.super_print("RETURNED FROM TRAIN ONE ITER: "+str(iter))
             loss_tr += loss_temp / self.print_every
             acc_tr += acc_temp / self.print_every
             if ((iter)%self.print_every) == 0 or iter == self.iter_count-1:
