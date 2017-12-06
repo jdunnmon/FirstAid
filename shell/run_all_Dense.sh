@@ -1,5 +1,4 @@
-EXEC_SCRIPT=/Users/annhe/Projects/tandaExperiment/FirstAid_Jared/FirstAid/train_CNNclassification.py
-#EXEC_SCRIPT=/home/annhe/Projects/tandaExperiment/FirstAid_Jared/FirstAid/train_CNNclassification.py
+EXEC_SCRIPT=/home/annhe/Projects/tandaExperiment/FirstAid/train_CNNclassification.py
 
 #TRAIN_PATH_ROOT="/Users/annhe/Projects/tandaExperiment/ddsm-h5-750/"
 TRAIN_PATH_ROOT="/scratch/users/annhe/ddsm-h5-750/"
@@ -12,7 +11,7 @@ OUTPUT_PATH="/scratch/users/annhe/log_runs"
 CUDA_VISIBLE_DEVICES=0
 
 NET_NAME=Dense
-EPOCHS=30
+EPOCHS=800
 
 EXP_NAME=hp_search_${NET_NAME}_optim_test
 START_DATE=`date +"%m_%d_%y"`
@@ -23,7 +22,7 @@ nChannels=1
 # removed yellowfin from opt
 for opt in adam
 do
-for lr in 0.001
+for lr in 0.1
 do
 for dp in 0.9
 do
