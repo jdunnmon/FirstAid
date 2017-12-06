@@ -22,7 +22,7 @@ nChannels=1
 # removed yellowfin from opt
 for opt in adam
 do
-for lr in 0.001
+for lr in 0.1
 do
 for dp in 0.8
 do
