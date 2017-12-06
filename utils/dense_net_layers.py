@@ -44,7 +44,7 @@ def avg_pool(_input, k):
     return output
 
 def batch_norm(_input, is_training):
-    print "TYPE OF IS TRAINING ", type(is_training)
+    #print "TYPE OF IS TRAINING ", type(is_training)
     #print "SHAPE OF IS TRAINING ", tf.shape(is_training)
     output = tf.contrib.layers.batch_norm(
         _input, scale=True, is_training=is_training,
@@ -154,7 +154,7 @@ def transition_layer_to_classes(_input, is_training, n_classes):
 
 def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_features, total_blocks, keep_prob=1.0, reduction=1.0, bc_mode=0, n_classes=2):
     # first - initial 3 x 3 conv to first_output_features
-    print "FROM DENSE NET TYPE OF IS TRAINING ", type(is_training)
+    #print "FROM DENSE NET TYPE OF IS TRAINING ", type(is_training)
     #print "FROM DENSE NET SHAPE OF IS TRAINING ", tf.shape(is_training)
     is_training = tf.cast(is_training, tf.bool)
     # if is_training is not None:
@@ -175,10 +175,10 @@ def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_f
         if block != total_blocks - 1:
             with tf.variable_scope("Transition_after_block_%d" % block):
                 output = transition_layer(output, is_training, reduction, keep_prob)
-    print "SHAPE OF LAST OUTPUT ", tf.shape(output)
+    #print "SHAPE OF LAST OUTPUT ", tf.shape(output)
     with tf.variable_scope("Transition_to_classes"):
         logits = transition_layer_to_classes(output, is_training, n_classes)
     prediction = tf.nn.softmax(logits)
-    print "SHAPE OF LOGITS ", tf.shape(logits)
-    print "SHAPE OF PREDICTION ", tf.shape(prediction)
+    #print "SHAPE OF LOGITS ", tf.shape(logits)
+    #print "SHAPE OF PREDICTION ", tf.shape(prediction)
     return logits

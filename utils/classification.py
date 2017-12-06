@@ -111,7 +111,7 @@ def average_gradients(grads_multi):
         for g,_ in grad_and_vars:
             if g is None:
                 continue
-            print "FROM AVERAGE GRADIENTS ", _
+            #print "FROM AVERAGE GRADIENTS ", _
             expanded_g = tf.expand_dims(g,0)
             grads.append(expanded_g)
         if grads == []:
@@ -182,13 +182,13 @@ class classifier:
         self.acc = get_accuracy(self.pred, self.yTe)
         self.cropping_style = self.opts.cropping_style
 
-        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-        K.set_session(self.sess)
-        graph  = self.sess.graph
-        tbpath,_ = os.path.split(self.opts.path_log)
-        tbdir = join(tbpath,"tbout")
-        self.writer = tf.summary.FileWriter(tbdir, graph)
-        print "Tensorboard log directory: ", tbdir
+        # self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        # K.set_session(self.sess)
+        # graph  = self.sess.graph
+        # tbpath,_ = os.path.split(self.opts.path_log)
+        # tbdir = join(tbpath,"tbout")
+        # self.writer = tf.summary.FileWriter(tbdir, graph)
+        # self.super_print("Tensorboard log directory: "+tbdir)
 
         # Listing the data.
         if self.opts.path_train:
@@ -214,6 +214,7 @@ class classifier:
             self.X_te = list_imgs
         optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every,self.opts.optim)
         grads = optimizer.compute_gradients(self.cost)
+        print "VALUE OF GLOBAL STEP TO OPTIMIZER ", global_step
         self.optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
         # Creating the Network for Training
@@ -281,6 +282,16 @@ class classifier:
 
         self.dataXX = np.zeros(xTr_size, dtype=np.float32)
         self.dataYY = np.zeros(yTr_size, dtype=np.int64)
+
+        self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
+        #K.set_session(self.sess)
+        # graph  = self.sess.graph
+        # tbpath,_ = os.path.split(self.opts.path_log)
+        # tbdir = join(tbpath,"tbout")
+        # self.writer = tf.summary.FileWriter(tbdir, graph)
+        # self.super_print("Tensorboard log directory: "+tbdir)
+
+
 
     def average_accuracy(self, logits, truth):
         prediction = np.argmax(logits, axis=1)
