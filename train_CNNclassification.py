@@ -53,7 +53,7 @@ def main(args):
     # Parameters/Hyper-parameteres for DenseNet
     parser.add_argument("--depth", type=int, default=40)
     # reduction Theta at transition layer for DenseNets-BC models
-    parser.add_argument("--reduction", type=float, default=0.5)
+    parser.add_argument("--reduction", type=float, default=1.0)
     parser.add_argument("--total_blocks", type=int, default=3)
     parser.add_argument("--growth_rate", type=int, default=12)
 
