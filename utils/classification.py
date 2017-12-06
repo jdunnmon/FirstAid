@@ -111,6 +111,7 @@ def average_gradients(grads_multi):
         for g,_ in grad_and_vars:
             if g is None:
                 continue
+            print "FROM AVERAGE GRADIENTS ", _
             expanded_g = tf.expand_dims(g,0)
             grads.append(expanded_g)
         if grads == []:
@@ -505,7 +506,6 @@ class classifier:
         for iter in range(self.iter_count):
             #self.super_print("BEGINNING ITERATION: "+str(iter))
             loss_temp, acc_temp = self.train_one_iter(iter)
-            #self.super_print("RETURNED FROM TRAIN ONE ITER: "+str(iter))
             loss_tr += loss_temp / self.print_every
             acc_tr += acc_temp / self.print_every
             if ((iter)%self.print_every) == 0 or iter == self.iter_count-1:
