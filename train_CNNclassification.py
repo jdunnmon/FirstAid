@@ -56,6 +56,7 @@ def main(args):
     parser.add_argument("--reduction", type=float, default=1.0)
     parser.add_argument("--total_blocks", type=int, default=3)
     parser.add_argument("--growth_rate", type=int, default=12)
+    parser.add_argument("--momentum", dest="momentum", type=float, default=0.9)
 
 
     # Creating Object

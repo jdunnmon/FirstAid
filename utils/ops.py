@@ -51,7 +51,7 @@ def get_accuracy(logits, labels):
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
     return accuracy
 
-def get_optimizer(lr, decay, epoch_every,optim="rmsrop"):
+def get_optimizer(lr, decay, epoch_every, nesterov_momentum=0.9, optim="rmsrop"):
     global_step = tf.Variable(0, trainable=False)
     starter_learning_rate = float(lr)
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
@@ -68,4 +68,7 @@ def get_optimizer(lr, decay, epoch_every,optim="rmsrop"):
     elif optim == "adam":
         optimizer = tf.train.AdamOptimizer(learning_rate)
         print "Optimizing with Adam"
+    elif optim == "sgd":
+        optimizer = tf.train.MomentumOptimizer(
+            learning_rate, nesterov_momentum, use_nesterov=True)
     return optimizer, global_step

@@ -137,6 +137,7 @@ class classifier:
         #print "cropping style", self.opts.cropping_style
         self.matrix_size = self.opts.image_size
         self.num_channels = self.opts.num_channels
+        self.momentum = self.opts.momentum
         # Creating the Placeholders.
         # if self.opts.path_train:
         #     self.matrix_size, self.num_channels = find_data_shape(self.opts.path_train)
@@ -212,7 +213,7 @@ class classifier:
                 if name_img[0] == '.':
                     list_imgs.remove(name_img)
             self.X_te = list_imgs
-        optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every,self.opts.optim)
+        optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every, self.momentum, self.opts.optim)
         grads = optimizer.compute_gradients(self.cost)
         print "VALUE OF GLOBAL STEP TO OPTIMIZER ", global_step
         self.optimizer = optimizer.apply_gradients(grads, global_step=global_step)
