@@ -175,6 +175,7 @@ def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_f
     #print "FROM DENSE NET TYPE OF IS TRAINING ", type(is_training)
     #print "FROM DENSE NET SHAPE OF IS TRAINING ", tf.shape(is_training)
     is_training = tf.cast(is_training, tf.bool)
+    print "FROM DENSE NET INIT TYPE OF KEEP PROB ", type(keep_prob)
     # if is_training is not None:
     #     is_training = True
     # else:
