@@ -52,7 +52,7 @@ def super_print(path, statement):
     return 0
 
 
-def create_exec_statement_test(opts):
+def create_exec_statement_test(opts, keep_prob):
     """
     Creates an executable statement string.
     Basically lets us keep everything general.
@@ -60,41 +60,86 @@ def create_exec_statement_test(opts):
     INPUTS:
     - opts: (object) command line arguments from argparser
     """
-    exec_statement = "self.pred = "
-    #self.pred =
-    exec_statement += opts.network
-    #self.pred = GoogLe
-    exec_statement += "_Net(self.xTe, self.is_training, "
-    #self.pred = GoogLe_Net(self.xTe, self.is_training,
-    exec_statement += str(opts.num_class)
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2
-    exec_statement += ", 1"
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1
-    exec_statement += ", self.keep_prob)"
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1, self.keep_prob)
+    if opts.network == "Dense":
+        exec_statement = "self.pred = Dense_Net(self.xTe, self.is_training, "
+        first_output_features = opts.growth_rate * 2
+        layers_per_block = (opts.depth - (opts.total_blocks + 1)) // opts.total_blocks
+        exec_statement += str(opts.growth_rate)
+        exec_statement += ", "
+        exec_statement += str(layers_per_block)
+        exec_statement += ", "
+        exec_statement += str(first_output_features)
+        exec_statement += ", "
+        exec_statement += str(opts.total_blocks)
+        exec_statement += ", "
+        exec_statement += "keep_prob"
+        exec_statement += ", "
+        exec_statement += str(opts.reduction)
+        exec_statement += ", "
+        exec_statement += str(opts.bc_mode)
+        exec_statement += ", "
+        exec_statement += str(opts.num_class)
+        exec_statement += ")"
+    else:
+        exec_statement = "self.pred = "
+        #self.pred =
+        exec_statement += opts.network
+        #self.pred = GoogLe
+        exec_statement += "_Net(self.xTe, self.is_training, "
+        #self.pred = GoogLe_Net(self.xTe, self.is_training,
+        exec_statement += str(opts.num_class)
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2
+        exec_statement += ", 1"
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1
+        exec_statement += ", "
+        exec_statement += str(opts.keep_prob)
+        exec_statement += ")"
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1, self.keep_prob)
     return exec_statement
 
-def create_exec_statement_train(opts):
+def create_exec_statement_train(opts, keep_prob):
     """
     Same as create_exec_statement_test but for multi
     gpu parsed training cycles.
     INPUTS:
     - opts: (object) command line arguments from argparser
     """
-    exec_statement = "pred = "
-    #pred =
-    exec_statement += opts.network
-    #pred = GoogLe
-    exec_statement += "_Net(multi_inputs[i], self.is_training, "
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training,
-    exec_statement += str(opts.num_class)
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2
-    exec_statement += ", "
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2,
-    exec_statement += str(opts.batch_size / max(1,opts.num_gpu))
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2, 12
-    exec_statement += ", self.keep_prob)"
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 12, self.keep_prob)
+    if opts.network == "Dense":
+        exec_statement = "pred = Dense_Net(multi_inputs[i], self.is_training, "
+        first_output_features = opts.growth_rate * 2
+        layers_per_block = (opts.depth - (opts.total_blocks + 1)) // opts.total_blocks
+        exec_statement += str(opts.growth_rate)
+        exec_statement += ", "
+        exec_statement += str(layers_per_block)
+        exec_statement += ", "
+        exec_statement += str(first_output_features)
+        exec_statement += ", "
+        exec_statement += str(opts.total_blocks)
+        exec_statement += ", "
+        exec_statement += "keep_prob"
+        exec_statement += ", "
+        exec_statement += str(opts.reduction)
+        exec_statement += ", "
+        exec_statement += str(opts.bc_mode)
+        exec_statement += ", "
+        exec_statement += str(opts.num_class)
+        exec_statement += ")"
+
+    else:
+        exec_statement = "pred = "
+        #pred =
+        exec_statement += opts.network
+        #pred = GoogLe
+        exec_statement += "_Net(multi_inputs[i], self.is_training, "
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training,
+        exec_statement += str(opts.num_class)
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2
+        exec_statement += ", "
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2,
+        exec_statement += str(opts.batch_size / max(1,opts.num_gpu))
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2, 12
+        exec_statement += ", self.keep_prob)"
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 12, self.keep_prob)
     return exec_statement
 
 def average_gradients(grads_multi):
@@ -131,9 +176,8 @@ class classifier:
         INPUTS:
         - opts: (object) command line arguments from argparser
         """
-        print "FROM INIT: NETWORK TYPE: ", opts.network
-        print "OPTS FROM COMMAND LINE", opts
         self.opts = opts
+        keep_prob = opts.keep_prob
         #print "cropping style", self.opts.cropping_style
         self.matrix_size = self.opts.image_size
         self.num_channels = self.opts.num_channels
@@ -163,20 +207,12 @@ class classifier:
         self.keep_prob = tf.placeholder(tf.float32)
 
         # Creating the Network for Testing
-        if self.opts.network != "Dense":
-            exec_statement = create_exec_statement_test(opts)
-            exec exec_statement
-        else:
-            # invoke call for Dense_NET
-            first_output_features = self.opts.growth_rate * 2
-            layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
-            # YO ANN MAKE SURE YOU ARE PASSING IN THE RIGHT THINGS
-            # WHAT ABOUT IS_TRAINING HERE
-            self.pred = Dense_Net(self.xTe, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+        exec_statement = create_exec_statement_test(opts, keep_prob)
+        exec exec_statement
         self.L2_loss = get_L2_loss(self.opts.l2)
         self.L1_loss = get_L1_loss(self.opts.l1)
-        print "SHAPE OF self.pred ", self.pred.get_shape().as_list()
-        print "SHAPE OF self.yTe ", self.yTe.get_shape().as_list()
+        #print "SHAPE OF self.pred ", self.pred.get_shape().as_list()
+        #print "SHAPE OF self.yTe ", self.yTe.get_shape().as_list()
         self.ce_loss = get_ce_loss(self.pred, self.yTe)
         self.cost = self.ce_loss + self.L2_loss + self.L1_loss
         self.prob = tf.nn.softmax(self.pred)
@@ -215,7 +251,7 @@ class classifier:
             self.X_te = list_imgs
         optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every, self.momentum, self.opts.optim)
         grads = optimizer.compute_gradients(self.cost)
-        print "VALUE OF GLOBAL STEP TO OPTIMIZER ", global_step
+        #print "VALUE OF GLOBAL STEP TO OPTIMIZER ", global_step
         self.optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
         # Creating the Network for Training
@@ -228,13 +264,8 @@ class classifier:
         for i in xrange(self.opts.num_gpu):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('gpu%d' % i) as scope:
-                    if self.opts.network != "Dense":
-                        exec_statement = create_exec_statement_train(opts)
-                        exec exec_statement
-                    else:
-                        first_output_features = self.opts.growth_rate * 2
-                        layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
-                        pred = Dense_Net(self.xTr, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+                    exec_statement = create_exec_statement_train(opts, keep_prob)
+                    exec exec_statement
                     loss = get_ce_loss(pred, multi_outputs[i])
                     loss_multi.append(loss)
                     cost = loss + self.L2_loss + self.L1_loss
@@ -247,13 +278,8 @@ class classifier:
         if self.opts.num_gpu == 0:
             i = 0
             with tf.name_scope('cpu0') as scope:
-                if self.opts.network != "Dense":
-                    exec_statement = create_exec_statement_train(opts)
-                    exec exec_statement
-                else:
-                    first_output_features = self.opts.growth_rate * 2
-                    layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
-                    pred = Dense_Net(self.xTr, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+                exec_statement = create_exec_statement_train(opts, keep_prob)
+                exec exec_statement
                 loss = get_ce_loss(pred, multi_outputs[i])
                 loss_multi.append(loss)
                 cost = loss + self.L2_loss + self.L1_loss
@@ -286,11 +312,11 @@ class classifier:
 
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         #K.set_session(self.sess)
-        # graph  = self.sess.graph
-        # tbpath,_ = os.path.split(self.opts.path_log)
-        # tbdir = join(tbpath,"tbout")
-        # self.writer = tf.summary.FileWriter(tbdir, graph)
-        # self.super_print("Tensorboard log directory: "+tbdir)
+        graph  = self.sess.graph
+        tbpath,_ = os.path.split(self.opts.path_log)
+        tbdir = join(tbpath,"tbout")
+        self.writer = tf.summary.FileWriter(tbdir, graph)
+        self.super_print("Tensorboard log directory: "+tbdir)
 
 
 

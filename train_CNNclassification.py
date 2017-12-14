@@ -9,7 +9,6 @@ def main(args):
     INPUTS:
     - args: (list of strings) command line arguments
     """
-    print "I am in main"
     # Reading command line arguments into parser.
     parser = argparse.ArgumentParser(description = "Do CNN Segmentation.")
 
@@ -52,6 +51,7 @@ def main(args):
 
     # Parameters/Hyper-parameteres for DenseNet
     parser.add_argument("--depth", type=int, default=40)
+    parser.add_argument("--bc_mode", type=int, default=0)
     # reduction Theta at transition layer for DenseNets-BC models
     parser.add_argument("--reduction", type=float, default=1.0)
     parser.add_argument("--total_blocks", type=int, default=3)
@@ -62,7 +62,6 @@ def main(args):
     # Creating Object
 
     opts = parser.parse_args(args[1:])
-    print "YO YO YO"
     CNN_obj = classifier(opts)
     CNN_obj.train_model() #Train/Validate the Model
     CNN_obj.test_model() #Test the Model.
