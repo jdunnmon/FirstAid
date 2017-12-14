@@ -61,7 +61,7 @@ def create_exec_statement_test(opts, keep_prob):
     - opts: (object) command line arguments from argparser
     """
     if opts.network == "Dense":
-        exec_statement = "pred = Dense_Net(self.xTe, self.is_training, "
+        exec_statement = "self.pred = Dense_Net(self.xTe, self.is_training, "
         first_output_features = opts.growth_rate * 2
         layers_per_block = (opts.depth - (opts.total_blocks + 1)) // opts.total_blocks
         exec_statement += str(opts.growth_rate)
