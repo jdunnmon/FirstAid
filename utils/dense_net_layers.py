@@ -177,12 +177,12 @@ def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_f
     # else:
     #     is_training = False
     with tf.variable_scope("Initial_convolution"):
-        if _input.shape[0] == 32:
+        if _input.shape[1] == 32:
             output = conv2d(
                 _input,
                 out_features=first_output_features,
                 kernel_size=3)
-        elif _input.shape[0] == 224:
+        elif _input.shape[1] == 224:
             output = conv2d(
                 _input,
                 out_features=first_output_features,
