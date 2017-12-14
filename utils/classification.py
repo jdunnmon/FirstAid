@@ -269,6 +269,7 @@ class classifier:
         for i in xrange(self.opts.num_gpu):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('gpu%d' % i) as scope:
+                    print "ABOUT TO EXEC TRAIN ", type(opts.keep_prob)
                     exec_statement = create_exec_statement_train(opts)
                     exec exec_statement
                     loss = get_ce_loss(pred, multi_outputs[i])
