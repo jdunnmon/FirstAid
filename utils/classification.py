@@ -104,8 +104,6 @@ def create_exec_statement_train(opts, keep_prob):
     INPUTS:
     - opts: (object) command line arguments from argparser
     """
-
-    print "TYPE OF KEEP PROB FROM CREATE TRAIN ", type(opts.keep_prob)
     if opts.network == "Dense":
         exec_statement = "pred = Dense_Net(multi_inputs[i], self.is_training, "
         first_output_features = opts.growth_rate * 2
@@ -178,9 +176,6 @@ class classifier:
         INPUTS:
         - opts: (object) command line arguments from argparser
         """
-        print "FROM INIT: NETWORK TYPE: ", opts.network
-        print "OPTS FROM COMMAND LINE", opts
-        print "FROM COMMAND LINE TYPE OF KEEP PROB ", type(opts.keep_prob)
         self.opts = opts
         keep_prob = opts.keep_prob
         #print "cropping style", self.opts.cropping_style
@@ -210,7 +205,6 @@ class classifier:
         self.yTr = tf.placeholder(tf.int64, yTr_size)
         self.is_training = tf.placeholder_with_default(1, shape=())
         self.keep_prob = tf.placeholder(tf.float32)
-        print "FROM COMMAND LINE TYPE OF KEEP PROB AFTER PLACEHOLDER ", type(opts.keep_prob)
 
         # Creating the Network for Testing
         exec_statement = create_exec_statement_test(opts, keep_prob)
@@ -270,7 +264,6 @@ class classifier:
         for i in xrange(self.opts.num_gpu):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('gpu%d' % i) as scope:
-                    print "ABOUT TO EXEC TRAIN ", type(opts.keep_prob)
                     exec_statement = create_exec_statement_train(opts, keep_prob)
                     exec exec_statement
                     loss = get_ce_loss(pred, multi_outputs[i])
@@ -319,11 +312,11 @@ class classifier:
 
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
         #K.set_session(self.sess)
-        # graph  = self.sess.graph
-        # tbpath,_ = os.path.split(self.opts.path_log)
-        # tbdir = join(tbpath,"tbout")
-        # self.writer = tf.summary.FileWriter(tbdir, graph)
-        # self.super_print("Tensorboard log directory: "+tbdir)
+        graph  = self.sess.graph
+        tbpath,_ = os.path.split(self.opts.path_log)
+        tbdir = join(tbpath,"tbout")
+        self.writer = tf.summary.FileWriter(tbdir, graph)
+        self.super_print("Tensorboard log directory: "+tbdir)
 
 
 
