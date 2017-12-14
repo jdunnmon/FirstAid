@@ -14,7 +14,7 @@ export CUDA_VISIBLE_DEVICES=0
 NET_NAME=Dense
 EPOCHS=300
 
-EXP_NAME=hp_search_${NET_NAME}_optim_test
+EXP_NAME=hp_search_${NET_NAME}_ann_run_v2
 START_DATE=`date +"%m_%d_%y"`
 crop='random'
 xSize=224
@@ -25,7 +25,7 @@ for opt in sgd
 do
 for lr in 0.1 0.01 0.001  
 do
-for dp in 1.0 0.9 0.8
+for dp in  0.9
 do
 for l2 in 0
 do
@@ -33,7 +33,7 @@ for dec in 1.0 0.99 0.97
 do
 for l1 in 0
 do
-for bs in 32 64 96
+for bs in 96 64 32
 do
   echo "Running Case with OPT = $opt, LR = $lr, L2= $l2, DO = $dp, DEC= $dec, l1=$l1, BS=$bs"
   TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_opt_${opt}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_${bs}

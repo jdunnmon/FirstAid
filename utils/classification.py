@@ -516,7 +516,7 @@ class classifier:
 
     def add_scalar_summary(self,val,name,it):
         value = tf.summary.Summary.Value(tag=name, simple_value=val)
-        #self.writer.add_summary(tf.summary.Summary(value=[value]),it)
+        self.writer.add_summary(tf.summary.Summary(value=[value]),it)
 
 
     def train_model(self):
