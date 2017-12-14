@@ -60,18 +60,39 @@ def create_exec_statement_test(opts):
     INPUTS:
     - opts: (object) command line arguments from argparser
     """
-    exec_statement = "self.pred = "
-    #self.pred =
-    exec_statement += opts.network
-    #self.pred = GoogLe
-    exec_statement += "_Net(self.xTe, self.is_training, "
-    #self.pred = GoogLe_Net(self.xTe, self.is_training,
-    exec_statement += str(opts.num_class)
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2
-    exec_statement += ", 1"
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1
-    exec_statement += ", self.keep_prob)"
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1, self.keep_prob)
+    if opts.network == "Dense":
+        exec_statement = "pred = Dense_Net(self.xTe, self.is_training, "
+        first_output_features = opts.growth_rate * 2
+        layers_per_block = (opts.depth - (opts.total_blocks + 1)) // opts.total_blocks
+        exec_statement += str(opts.growth_rate)
+        exec_statement += ", "
+        exec_statement += str(layers_per_block)
+        exec_statement += ", "
+        exec_statement += str(first_output_features)
+        exec_statement += ", "
+        exec_statement += str(opts.total_blocks)
+        exec_statement += ", "
+        exec_statement += "self.keep_prob"
+        exec_statement += ", "
+        exec_statement += str(opts.reduction)
+        exec_statement += ", "
+        exec_statement += str(opts.bc_mode)
+        exec_statement += ", "
+        exec_statement += str(opts.num_class)
+        exec_statement += ")"
+    else:
+        exec_statement = "self.pred = "
+        #self.pred =
+        exec_statement += opts.network
+        #self.pred = GoogLe
+        exec_statement += "_Net(self.xTe, self.is_training, "
+        #self.pred = GoogLe_Net(self.xTe, self.is_training,
+        exec_statement += str(opts.num_class)
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2
+        exec_statement += ", 1"
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1
+        exec_statement += ", self.keep_prob)"
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1, self.keep_prob)
     return exec_statement
 
 def create_exec_statement_train(opts):
@@ -81,20 +102,42 @@ def create_exec_statement_train(opts):
     INPUTS:
     - opts: (object) command line arguments from argparser
     """
-    exec_statement = "pred = "
-    #pred =
-    exec_statement += opts.network
-    #pred = GoogLe
-    exec_statement += "_Net(multi_inputs[i], self.is_training, "
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training,
-    exec_statement += str(opts.num_class)
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2
-    exec_statement += ", "
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2,
-    exec_statement += str(opts.batch_size / max(1,opts.num_gpu))
-    #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2, 12
-    exec_statement += ", self.keep_prob)"
-    #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 12, self.keep_prob)
+    if opts.network == "Dense":
+        exec_statement = "pred = Dense_Net(multi_inputs[i], self.is_training, "
+        first_output_features = opts.growth_rate * 2
+        layers_per_block = (opts.depth - (opts.total_blocks + 1)) // opts.total_blocks
+        exec_statement += str(opts.growth_rate)
+        exec_statement += ", "
+        exec_statement += str(layers_per_block)
+        exec_statement += ", "
+        exec_statement += str(first_output_features)
+        exec_statement += ", "
+        exec_statement += str(opts.total_blocks)
+        exec_statement += ", "
+        exec_statement += "self.keep_prob"
+        exec_statement += ", "
+        exec_statement += str(opts.reduction)
+        exec_statement += ", "
+        exec_statement += str(opts.bc_mode)
+        exec_statement += ", "
+        exec_statement += str(opts.num_class)
+        exec_statement += ")"
+
+    else:
+        exec_statement = "pred = "
+        #pred =
+        exec_statement += opts.network
+        #pred = GoogLe
+        exec_statement += "_Net(multi_inputs[i], self.is_training, "
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training,
+        exec_statement += str(opts.num_class)
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2
+        exec_statement += ", "
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2,
+        exec_statement += str(opts.batch_size / max(1,opts.num_gpu))
+        #pred = GoogLe_Net(multi_inputs[i], self.is_training, 2, 12
+        exec_statement += ", self.keep_prob)"
+        #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 12, self.keep_prob)
     return exec_statement
 
 def average_gradients(grads_multi):
@@ -163,16 +206,8 @@ class classifier:
         self.keep_prob = tf.placeholder(tf.float32)
 
         # Creating the Network for Testing
-        if self.opts.network != "Dense":
-            exec_statement = create_exec_statement_test(opts)
-            exec exec_statement
-        else:
-            # invoke call for Dense_NET
-            first_output_features = self.opts.growth_rate * 2
-            layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
-            # YO ANN MAKE SURE YOU ARE PASSING IN THE RIGHT THINGS
-            # WHAT ABOUT IS_TRAINING HERE
-            self.pred = Dense_Net(self.xTe, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+        exec_statement = create_exec_statement_test(opts)
+        exec exec_statement
         self.L2_loss = get_L2_loss(self.opts.l2)
         self.L1_loss = get_L1_loss(self.opts.l1)
         print "SHAPE OF self.pred ", self.pred.get_shape().as_list()
@@ -228,13 +263,8 @@ class classifier:
         for i in xrange(self.opts.num_gpu):
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('gpu%d' % i) as scope:
-                    if self.opts.network != "Dense":
-                        exec_statement = create_exec_statement_train(opts)
-                        exec exec_statement
-                    else:
-                        first_output_features = self.opts.growth_rate * 2
-                        layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
-                        pred = Dense_Net(self.xTr, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+                    exec_statement = create_exec_statement_train(opts)
+                    exec exec_statement
                     loss = get_ce_loss(pred, multi_outputs[i])
                     loss_multi.append(loss)
                     cost = loss + self.L2_loss + self.L1_loss
