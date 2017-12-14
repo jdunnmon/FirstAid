@@ -1,17 +1,18 @@
-EXEC_SCRIPT=/home/annhe/Projects/tandaExperiment/FirstAid/train_CNNclassification.py
+EXEC_SCRIPT=../train_CNNclassification.py
 
 #TRAIN_PATH_ROOT="/Users/annhe/Projects/tandaExperiment/ddsm-h5-750/"
-TRAIN_PATH_ROOT="/scratch/users/annhe/ddsm-h5-750/"
-DATA_SUF=""
+#TRAIN_PATH_ROOT="/scratch/users/annhe/ddsm-h5-750/"
+TRAIN_PATH_ROOT="/mnt/data-1/users/jdunnmon/data_aug/ddsm-data/ann_preproc/h5_data_all/"
+DATA_SUF="_all"
 PATH_TRAIN="$TRAIN_PATH_ROOT/h5_train_set$DATA_SUF"
 PATH_VAL="$TRAIN_PATH_ROOT/h5_val_set$DATA_SUF"
 PATH_TEST="$TRAIN_PATH_ROOT/h5_test_set$DATA_SUF"
-OUTPUT_PATH="/scratch/users/annhe/log_runs"
+OUTPUT_PATH="/mnt/data-1/users/jdunnmon/data_aug/firstaid/all_runs/logs/ann_densenet_test"
 
-CUDA_VISIBLE_DEVICES=0
+CUDA_VISIBLE_DEVICES=1
 
 NET_NAME=Dense
-EPOCHS=800
+EPOCHS=200
 
 EXP_NAME=hp_search_${NET_NAME}_optim_test
 START_DATE=`date +"%m_%d_%y"`
@@ -22,17 +23,17 @@ nChannels=1
 # removed yellowfin from opt
 for opt in sgd
 do
-for lr in 0.001
+for lr in 0.01 0.005 0.001 0.0005 0.0001
 do
-for dp in 0.8
+for dp in 0.9 0.8
 do
-for l2 in 0.0001
+for l2 in 0.0001 0.00001
 do
-for dec in 0.99
+for dec in 1.0 0.99 
 do
 for l1 in 0
 do
-for bs in 4
+for bs in 16
 do
   echo "Running Case with OPT = $opt, LR = $lr, L2= $l2, DO = $dp, DEC= $dec, l1=$l1, BS=$bs"
   TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_opt_${opt}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_${bs}
