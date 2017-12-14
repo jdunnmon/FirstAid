@@ -189,10 +189,10 @@ def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_f
             output = conv2d(
                 _input,
                 out_features=first_output_features,
-                kernel_size=7, strides=[1,2,2,1], padding=3)
+                kernel_size=7, strides=[1,2,2,1], padding='SAME')
             output = batch_norm(output, is_training)
             output = tf.nn.relu(output)
-            output = max_pool(output, k=3, stride=1, padding=1)
+            output = max_pool(output, k=3, stride=1, padding='SAME')
 
 
     # add N required blocks
