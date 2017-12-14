@@ -52,7 +52,7 @@ def super_print(path, statement):
     return 0
 
 
-def create_exec_statement_test(opts):
+def create_exec_statement_test(opts, keep_prob):
     """
     Creates an executable statement string.
     Basically lets us keep everything general.
@@ -97,7 +97,7 @@ def create_exec_statement_test(opts):
         #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1, self.keep_prob)
     return exec_statement
 
-def create_exec_statement_train(opts):
+def create_exec_statement_train(opts, keep_prob):
     """
     Same as create_exec_statement_test but for multi
     gpu parsed training cycles.
@@ -182,6 +182,7 @@ class classifier:
         print "OPTS FROM COMMAND LINE", opts
         print "FROM COMMAND LINE TYPE OF KEEP PROB ", type(opts.keep_prob)
         self.opts = opts
+        keep_prob = opts.keep_prob
         #print "cropping style", self.opts.cropping_style
         self.matrix_size = self.opts.image_size
         self.num_channels = self.opts.num_channels
@@ -212,7 +213,7 @@ class classifier:
         print "FROM COMMAND LINE TYPE OF KEEP PROB AFTER PLACEHOLDER ", type(opts.keep_prob)
 
         # Creating the Network for Testing
-        exec_statement = create_exec_statement_test(opts)
+        exec_statement = create_exec_statement_test(opts, keep_prob)
         exec exec_statement
         self.L2_loss = get_L2_loss(self.opts.l2)
         self.L1_loss = get_L1_loss(self.opts.l1)
@@ -270,7 +271,7 @@ class classifier:
             with tf.device('/gpu:%d' % i):
                 with tf.name_scope('gpu%d' % i) as scope:
                     print "ABOUT TO EXEC TRAIN ", type(opts.keep_prob)
-                    exec_statement = create_exec_statement_train(opts)
+                    exec_statement = create_exec_statement_train(opts, keep_prob)
                     exec exec_statement
                     loss = get_ce_loss(pred, multi_outputs[i])
                     loss_multi.append(loss)
@@ -284,13 +285,8 @@ class classifier:
         if self.opts.num_gpu == 0:
             i = 0
             with tf.name_scope('cpu0') as scope:
-                if self.opts.network != "Dense":
-                    exec_statement = create_exec_statement_train(opts)
-                    exec exec_statement
-                else:
-                    first_output_features = self.opts.growth_rate * 2
-                    layers_per_block = (self.opts.depth - (self.opts.total_blocks + 1)) // self.opts.total_blocks
-                    pred = Dense_Net(self.xTr, self.is_training, self.opts.growth_rate, layers_per_block, first_output_features, self.opts.total_blocks, self.opts.keep_prob, self.opts.reduction)
+                exec_statement = create_exec_statement_train(opts, keep_prob)
+                exec exec_statement
                 loss = get_ce_loss(pred, multi_outputs[i])
                 loss_multi.append(loss)
                 cost = loss + self.L2_loss + self.L1_loss
