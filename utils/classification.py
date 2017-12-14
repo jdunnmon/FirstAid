@@ -91,7 +91,9 @@ def create_exec_statement_test(opts):
         #self.pred = GoogLe_Net(self.xTe, self.is_training, 2
         exec_statement += ", 1"
         #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1
-        exec_statement += ", self.keep_prob)"
+        exec_statement += ", "
+        exec_statement += str(opts.keep_prob)
+        exec_statement += ")"
         #self.pred = GoogLe_Net(self.xTe, self.is_training, 2, 1, self.keep_prob)
     return exec_statement
 
@@ -114,7 +116,7 @@ def create_exec_statement_train(opts):
         exec_statement += ", "
         exec_statement += str(opts.total_blocks)
         exec_statement += ", "
-        exec_statement += "self.keep_prob"
+        exec_statement += str(opts.keep_prob)
         exec_statement += ", "
         exec_statement += str(opts.reduction)
         exec_statement += ", "
