@@ -211,8 +211,8 @@ class classifier:
         exec exec_statement
         self.L2_loss = get_L2_loss(self.opts.l2)
         self.L1_loss = get_L1_loss(self.opts.l1)
-        print "SHAPE OF self.pred ", self.pred.get_shape().as_list()
-        print "SHAPE OF self.yTe ", self.yTe.get_shape().as_list()
+        #print "SHAPE OF self.pred ", self.pred.get_shape().as_list()
+        #print "SHAPE OF self.yTe ", self.yTe.get_shape().as_list()
         self.ce_loss = get_ce_loss(self.pred, self.yTe)
         self.cost = self.ce_loss + self.L2_loss + self.L1_loss
         self.prob = tf.nn.softmax(self.pred)
@@ -251,7 +251,7 @@ class classifier:
             self.X_te = list_imgs
         optimizer,global_step = get_optimizer(self.opts.lr, self.opts.lr_decay, self.epoch_every, self.momentum, self.opts.optim)
         grads = optimizer.compute_gradients(self.cost)
-        print "VALUE OF GLOBAL STEP TO OPTIMIZER ", global_step
+        #print "VALUE OF GLOBAL STEP TO OPTIMIZER ", global_step
         self.optimizer = optimizer.apply_gradients(grads, global_step=global_step)
 
         # Creating the Network for Training

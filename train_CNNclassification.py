@@ -9,7 +9,6 @@ def main(args):
     INPUTS:
     - args: (list of strings) command line arguments
     """
-    print "I am in main"
     # Reading command line arguments into parser.
     parser = argparse.ArgumentParser(description = "Do CNN Segmentation.")
 
