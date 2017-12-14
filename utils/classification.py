@@ -311,7 +311,7 @@ class classifier:
         self.dataYY = np.zeros(yTr_size, dtype=np.int64)
 
         self.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
-        #K.set_session(self.sess)
+        K.set_session(self.sess)
         graph  = self.sess.graph
         tbpath,_ = os.path.split(self.opts.path_log)
         tbdir = join(tbpath,"tbout")
@@ -537,6 +537,10 @@ class classifier:
             #self.sess.run(tf.variables_initializer(optimizer_scope))
         else:
             self.sess.run(self.init)
+	#Early stopping parameters:
+	patience = 30
+        patience_cnt = 0
+	min_delta = 0.005
         # Training
         self.super_print("Let's start the training!")
         loss_min = 1000000
@@ -585,6 +589,16 @@ class classifier:
                     if loss_val < loss_min:
                         loss_min = loss_val
                         self.saver.save(self.sess, self.opts.path_model)
+		    if iter>0 and self.val_loss[-2]-self.val_loss[-1] > min_delta:
+		        patience_cnt = 0
+			#print 'Resetting Patience Count'
+		    else:
+			patience_cnt += 1
+			#print 'Patience Count: ', patience_cnt
+		   
+		    if patience_cnt > patience:
+			print 'Early Stopping!'
+			break
                 if self.opts.bool_display:
                     self.super_graph()
                 self.super_print(statement)

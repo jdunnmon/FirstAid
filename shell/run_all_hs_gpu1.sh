@@ -12,7 +12,7 @@ OUTPUT_PATH="/mnt/data-1/users/jdunnmon/data_aug/firstaid/all_runs/logs/ann_dens
 export CUDA_VISIBLE_DEVICES=1
 
 NET_NAME=Dense
-EPOCHS=300
+EPOCHS=400
 
 EXP_NAME=hp_search_${NET_NAME}_ann_run_v2
 START_DATE=`date +"%m_%d_%y"`
@@ -23,17 +23,17 @@ nChannels=1
 # removed yellowfin from opt
 for opt in sgd
 do
-for lr in 0.1 0.01 0.001  
+for lr in 0.5 0.1 0.01 0.001  
 do
 for dp in  0.8
 do
 for l2 in 0
 do
-for dec in 1.0 0.99 0.97
+for dec in 1.0 0.99
 do
 for l1 in 0
 do
-for bs in 96 64 32
+for bs in 96 64 32 16
 do
   echo "Running Case with OPT = $opt, LR = $lr, L2= $l2, DO = $dp, DEC= $dec, l1=$l1, BS=$bs"
   TRIAL_NAME=${EXP_NAME}_ep_${EPOCHS}_opt_${opt}_lr_${lr}_dp_${dp}_l2_${l2}_dec_${dec}_l1_${l1}_bs_${bs}
