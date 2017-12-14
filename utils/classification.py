@@ -104,6 +104,8 @@ def create_exec_statement_train(opts):
     INPUTS:
     - opts: (object) command line arguments from argparser
     """
+
+    print "TYPE OF KEEP PROB FROM CREATE TRAIN ", type(opts.keep_prob)
     if opts.network == "Dense":
         exec_statement = "pred = Dense_Net(multi_inputs[i], self.is_training, "
         first_output_features = opts.growth_rate * 2
