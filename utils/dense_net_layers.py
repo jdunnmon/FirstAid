@@ -152,6 +152,21 @@ def transition_layer_to_classes(_input, is_training, n_classes):
     logits = tf.matmul(output, W) + bias
     return logits
 
+def max_pool(layer, k=2, stride=None, padding='SAME'):
+    """
+    A simple 2-dimensional max pooling layer.
+    Strides and size of max pool kernel is constrained to be the same.
+    INPUTS:
+    - layer: (tensor.4d) input of size [batch_size, layer_width, layer_height, channels]
+    - k: (int) size of the max_filter to be made.
+    - stride: (int) size of stride
+    """
+    if stride==None:
+        stride=k
+    # Doing the Max Pool
+    max_layer = tf.nn.max_pool(layer, ksize = [1, k, k, 1], strides = [1, stride, stride, 1], padding)
+    return max_layer
+
 def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_features, total_blocks, keep_prob=1.0, reduction=1.0, bc_mode=0, n_classes=2):
     # first - initial 3 x 3 conv to first_output_features
     #print "FROM DENSE NET TYPE OF IS TRAINING ", type(is_training)
@@ -162,10 +177,20 @@ def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_f
     # else:
     #     is_training = False
     with tf.variable_scope("Initial_convolution"):
-        output = conv2d(
-            _input,
-            out_features=first_output_features,
-            kernel_size=3)
+        if _input.shape[0] == 32:
+            output = conv2d(
+                _input,
+                out_features=first_output_features,
+                kernel_size=3)
+        elif _input.shape[0] == 224:
+            output = conv2d(
+                _input,
+                out_features=first_output_features,
+                kernel_size=7, strides=[1,2,2,1], padding=3)
+            output = batch_norm(output, is_training)
+            output = tf.nn.relu(output)
+            output = max_pool(output, k=3, stride=1, padding=1)
+
 
     # add N required blocks
     for block in range(total_blocks):
