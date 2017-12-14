@@ -72,7 +72,7 @@ def create_exec_statement_test(opts, keep_prob):
         exec_statement += ", "
         exec_statement += str(opts.total_blocks)
         exec_statement += ", "
-        exec_statement += "self.keep_prob"
+        exec_statement += "keep_prob"
         exec_statement += ", "
         exec_statement += str(opts.reduction)
         exec_statement += ", "
@@ -118,7 +118,7 @@ def create_exec_statement_train(opts, keep_prob):
         exec_statement += ", "
         exec_statement += str(opts.total_blocks)
         exec_statement += ", "
-        exec_statement += str(opts.keep_prob)
+        exec_statement += "keep_prob"
         exec_statement += ", "
         exec_statement += str(opts.reduction)
         exec_statement += ", "
