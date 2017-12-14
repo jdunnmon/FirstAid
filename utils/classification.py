@@ -180,6 +180,7 @@ class classifier:
         """
         print "FROM INIT: NETWORK TYPE: ", opts.network
         print "OPTS FROM COMMAND LINE", opts
+        print "FROM COMMAND LINE TYPE OF KEEP PROB ", type(opts.keep_prob)
         self.opts = opts
         #print "cropping style", self.opts.cropping_style
         self.matrix_size = self.opts.image_size
