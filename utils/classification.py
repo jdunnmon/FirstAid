@@ -209,6 +209,7 @@ class classifier:
         self.yTr = tf.placeholder(tf.int64, yTr_size)
         self.is_training = tf.placeholder_with_default(1, shape=())
         self.keep_prob = tf.placeholder(tf.float32)
+        print "FROM COMMAND LINE TYPE OF KEEP PROB AFTER PLACEHOLDER ", type(opts.keep_prob)
 
         # Creating the Network for Testing
         exec_statement = create_exec_statement_test(opts)
