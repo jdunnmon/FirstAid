@@ -164,7 +164,10 @@ def max_pool(layer, k=2, stride=None, padding='SAME'):
     if stride==None:
         stride=k
     # Doing the Max Pool
-    max_layer = tf.nn.max_pool(layer, ksize = [1, k, k, 1], strides = [1, stride, stride, 1], padding)
+    stride_var = [1, stride, stride, 1]
+    kernel_var = [1, k, k, 1]
+
+    max_layer = tf.nn.max_pool(layer, kernel_var, stride_var, padding)
     return max_layer
 
 def Dense_Net(_input, is_training, growth_rate, layers_per_block, first_output_features, total_blocks, keep_prob=1.0, reduction=1.0, bc_mode=0, n_classes=2):
