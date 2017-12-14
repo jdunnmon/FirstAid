@@ -22,7 +22,7 @@ nChannels=1
 # removed yellowfin from opt
 for opt in sgd
 do
-for lr in 0.001
+for lr in 0.01
 do
 for dp in 0.8
 do
