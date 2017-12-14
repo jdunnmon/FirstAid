@@ -63,7 +63,6 @@ def main(args):
     # Creating Object
 
     opts = parser.parse_args(args[1:])
-    print "YO YO YO"
     CNN_obj = classifier(opts)
     CNN_obj.train_model() #Train/Validate the Model
     CNN_obj.test_model() #Test the Model.
