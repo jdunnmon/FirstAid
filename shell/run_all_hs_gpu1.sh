@@ -12,9 +12,9 @@ OUTPUT_PATH="/mnt/data-1/users/jdunnmon/data_aug/firstaid/all_runs/logs/ann_dens
 export CUDA_VISIBLE_DEVICES=1
 
 NET_NAME=Dense
-EPOCHS=400
+EPOCHS=200
 
-EXP_NAME=hp_search_${NET_NAME}_ann_run_v2
+EXP_NAME=hp_search_${NET_NAME}_ann_run_v3
 START_DATE=`date +"%m_%d_%y"`
 crop='random'
 xSize=224
@@ -23,7 +23,7 @@ nChannels=1
 # removed yellowfin from opt
 for opt in sgd
 do
-for lr in 0.5 0.1 0.01 0.001  
+for lr in 0.1 0.01 0.001  
 do
 for dp in  0.8
 do
@@ -56,3 +56,7 @@ do
  done
  done
 
+SCRIPT_PATH=${0}
+SCRIPT_OUT_PATH="$OUTPUT_PATH/${START_DATE}/${EXP_NAME}"
+cp -r $SCRIPT_PATH $SCRIPT_OUT_PATH
+echo "Run complete. This script copied to $SCRIPT_OUT_PATH"
